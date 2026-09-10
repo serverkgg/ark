@@ -17,7 +17,7 @@ The ARK: Survival Ascended game package for the Serverk platform (`serverk.gg`).
 
 SteamCMD installs app `2430930` anonymously with `SteamcmdPlatform.Windows` — ASA ships no Linux server binary. The Windows depot is about **11 GiB**, so the first install is long and every later boot is a delta check; a full `validate` pass only runs while a game root is missing.
 
-The server is `ShooterGame/Binaries/Win64/ArkAscendedServer.exe`, started through `/opt/serverk/ark-start` and then GE-Proton. The launch string is `<Map>?listen?SessionName=…?Port=…?RCONPort=27020?RCONEnabled=True` followed by the flags (`-WinLiveMaxPlayers`, `-mods=`, `-servergamelog`, `-oldconsole`, `-nosteam`, and the crossplay, BattlEye and exclusive-join toggles).
+The server is `ShooterGame/Binaries/Win64/ArkAscendedServer.exe`, started through `/opt/serverk/ark-start` and then GE-Proton. The launch string is `<Map>?listen?SessionName=…?RCONPort=27020?RCONEnabled=True` followed by the flags (`-Port`, `-WinLiveMaxPlayers`, `-mods=`, `-servergamelog`, `-oldconsole`, `-nosteam`, and the crossplay, BattlEye and exclusive-join toggles). The game port rides `-Port=<n>` rather than the map string — the engine ignores a `?Port=` there and keeps listening on its default 7777.
 
 **No password ever rides argv.** The engine echoes its own command line into `ShooterGame.log`, and the wrapper tails that log into the customer's console, so `ServerPassword` and `ServerAdminPassword` are carried only in `[ServerSettings]` of `GameUserSettings.ini`, written by `applyControlConfig` and the settings module before every start.
 

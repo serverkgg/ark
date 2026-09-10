@@ -31,7 +31,6 @@ export const mapString = (input: ArkCommandInput) => {
 		input.map,
 		"listen",
 		`SessionName=${sanitizeSessionName(input.sessionName)}`,
-		`Port=${input.gamePort}`,
 		`RCONPort=${input.rconPort}`,
 		"RCONEnabled=True",
 	].join("?");
@@ -40,6 +39,7 @@ export const mapString = (input: ArkCommandInput) => {
 export const startArgs = (input: ArkCommandInput): string[] => {
 	return [
 		mapString(input),
+		`-Port=${input.gamePort}`,
 		`-WinLiveMaxPlayers=${clampMaxPlayers(input.maxPlayers)}`,
 		...(input.mods.length === 0
 			? []

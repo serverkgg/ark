@@ -25,9 +25,9 @@ describe("sanitizeSessionName", () => {
 });
 
 describe("mapString", () => {
-	test("carries the map, the name, the ports and the rcon switch and nothing else", () => {
+	test("carries the map, the name and the rcon switch and nothing else", () => {
 		expect(mapString(input())).toBe(
-			"TheIsland_WP?listen?SessionName=Serverk ARK abc123?Port=9001?RCONPort=27020?RCONEnabled=True",
+			"TheIsland_WP?listen?SessionName=Serverk ARK abc123?RCONPort=27020?RCONEnabled=True",
 		);
 	});
 
@@ -35,21 +35,36 @@ describe("mapString", () => {
 		expect(mapString(input())).not.toContain("Password");
 	});
 
-	test("reads both ports from the input rather than a constant", () => {
+	test("reads the rcon port from the input rather than a constant", () => {
 		expect(
 			mapString(
 				input({
-					gamePort: 9007,
 					rconPort: 27_021,
 				}),
 			),
-		).toContain("?Port=9007?RCONPort=27021?");
+		).toContain("?RCONPort=27021?");
+	});
+
+	test("never carries the game port, because the engine ignores it inside the map string", () => {
+		expect(mapString(input())).not.toContain("?Port=");
 	});
 });
 
 describe("startArgs", () => {
 	test("keeps the launch string first", () => {
 		expect(startArgs(input()).at(0)).toStartWith("TheIsland_WP?listen");
+	});
+
+	test("passes the game port as a flag, right after the launch string", () => {
+		expect(startArgs(input()).at(1)).toBe("-Port=9001");
+
+		expect(
+			startArgs(
+				input({
+					gamePort: 9007,
+				}),
+			).at(1),
+		).toBe("-Port=9007");
 	});
 
 	test("never lets a password reach argv, whatever the toggles", () => {
