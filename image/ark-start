@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+# ARK writes nothing useful to stdout under Proton, so the log the bridge reads for the
+# ready line, the events and the console is tailed here. Truncating first stops a
+# restart from replaying the previous run; -F follows the engine's rotation by name.
+# The tail stays inside the process group and dies with the game.
+mkdir -p ShooterGame/Saved/Logs
+: > ShooterGame/Saved/Logs/ShooterGame.log
+tail -n 0 -F ShooterGame/Saved/Logs/ShooterGame.log 2>/dev/null &
+
+mkdir -p /tmp/serverk-xdg
+chmod 0700 /tmp/serverk-xdg
+
+cd ShooterGame/Binaries/Win64
+
+exec xvfb-run -a "$@"

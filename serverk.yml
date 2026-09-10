@@ -1,0 +1,262 @@
+# yaml-language-server: $schema=./serverk.schema.json
+schemaVersion: serverk.gg/v1
+kind: GamePackage
+
+metadata:
+  id: ark
+  name:
+    ar: آرك سيرفايفل أسندد
+    en: "ARK: Survival Ascended"
+  description:
+    ar: سيرفر آرك سيرفايفل أسندد خاص فيك — روّض الديناصورات، ابنِ قاعدتك، وقرر قوانين الماب بنفسك. لوحة كاملة لكل إعدادات اللعبة، جدول اللاعبين، المودات من CurseForge، وتبديل المابات، مع RCON جاهز من أول تشغيل.
+    en: "Your own ARK: Survival Ascended server — tame the dinos, raise your base, and set every rule on the map yourself. A full panel for the game settings, the player table, CurseForge mods and map switching, with RCON ready from the first boot."
+  tagline:
+    ar: روّض أول ديناصور لك مع أصحابك — سيرفرك جاهز خلال دقايق
+    en: Tame your first dino with your friends — your server, ready in minutes
+  category: survival
+  logo: assets/logo.webp
+  banner: assets/banner.webp
+
+resources:
+  minMemoryMb: 16384
+  recommendedMemoryMb: 16384
+  minDiskMb: 20480
+  playersPerMemoryGb: 4
+  maxRecommendedPlayers: 70
+
+container:
+  image: serverkgg/ark
+  runtime:
+    platform: wine
+    installBudgetMinutes: 45
+    bootBudgetMinutes: 15
+    shmMb: 256
+    pidsLimit: 512
+  ports:
+    - key: game
+      containerPort: 7777
+      protocol: udp
+      mirror: true
+      name:
+        ar: آرك
+        en: ARK
+      hint:
+        ar: دوّر على اسم سيرفرك في قائمة Unofficial، أو افتح الكونسول داخل اللعبة واكتب open مع العنوان.
+        en: Find your server by name under Unofficial, or open the in-game console and type open with the address.
+      hostRange:
+        default: 9000
+        min: 9000
+        max: 9099
+    - key: rcon
+      containerPort: 27020
+      protocol: tcp
+      name:
+        ar: RCON
+        en: RCON
+      hint:
+        ar: للأدوات الخارجية بس، ما يدخل منه لاعب. يشتغل لما تفتح الوصول عن بُعد من اللوحة.
+        en: For external tools only, never for players. Live once remote access is turned on in the panel.
+      join: separate
+      hostRange:
+        default: 12500
+        min: 12500
+        max: 12599
+      activeWhen:
+        - variable: RCON_EXPOSED
+          values:
+            - "true"
+
+secrets:
+  - key: CURSEFORGE_API_KEY
+    description:
+      ar: مفتاح CurseForge API — بدونه يقفل كتالوج مودات آرك، ويبقى إضافة المود برقمه هو الطريق الوحيد.
+      en: CurseForge API key — without it the ARK mod catalog stays off and adding a mod by its id is the only way.
+    required: false
+
+backup:
+  only:
+    - ShooterGame/Saved/**
+    - ShooterGame/Binaries/Win64/BanList.txt
+    - ShooterGame/Binaries/Win64/PlayersExclusiveJoinList.txt
+    - .serverk-install.json
+    - .serverk-mods.json
+  except:
+    - ShooterGame/Saved/Logs/**
+    - ShooterGame/Saved/Crashes/**
+    - ShooterGame/Saved/Config/CrashReportClient/**
+
+reset:
+  keep:
+    - .steamcmd
+    - .steam
+    - .proton
+    - .serverk-wine.json
+    - steamapps
+    - Engine/**
+    - ShooterGame/Binaries/**
+    - ShooterGame/Content/**
+    - ShooterGame/Plugins/**
+    - .serverk-mods.json
+
+presence:
+  name: player
+  id: eosId
+  fields:
+    - key: eosId
+      label:
+        ar: رقم الحساب
+        en: Account id
+
+files:
+  protected:
+    - .steamcmd
+    - .steam
+    - .proton
+    - steamapps
+    - .serverk-wine.json
+    - .serverk-install.json
+    - .serverk-mods.json
+    - Engine
+    - ShooterGame/Binaries/Win64/ArkAscendedServer.exe
+    - ShooterGame/Binaries/Win64/ShooterGame/Mods
+    - ShooterGame/Content
+    - ShooterGame/Plugins
+  notable:
+    - match: ShooterGame/Saved/Config/WindowsServer/GameUserSettings.ini
+      label:
+        ar: إعدادات اللعبة
+        en: Game settings
+      icon: settings
+      color: "#de9b35"
+      restart: true
+      note:
+        ar: كل قوانين سيرفرك — PVP، المضاعفات، الترويض، والبناء. سيرفرك يكتب هذا الملف من ذاكرته كل ما يطفى، فأي تعديل تسويه بيدك وهو شغّال يروح. عدّل من تبويب الإعدادات وإحنا نكتبه لك قبل كل تشغيل.
+        en: Every rule your server runs on — PVP, the multipliers, taming and building. The server rewrites this file from memory every time it shuts down, so an edit you make by hand while it is up is lost. Change it from the Settings tab and we write it for you before every start.
+    - match: ShooterGame/Saved/Config/WindowsServer/Game.ini
+      label:
+        ar: التزاوج والإنجرامات
+        en: Breeding and engrams
+      icon: wrench
+      color: "#de9b35"
+      restart: true
+      note:
+        ar: هنا مضاعفات التزاوج وتربية الصغار وتعديلات الإنجرامات. الملف يقبل نفس المفتاح أكثر من مرة، فلا تحذف سطر ما كتبته بنفسك.
+        en: This is where the breeding and baby-raising multipliers live, plus the engram overrides. The file legitimately repeats the same key, so never delete a line you did not write yourself.
+    - match: ShooterGame/Saved/SavedArks
+      label:
+        ar: عالمك
+        en: Your world
+      icon: globe
+      color: "#4a8fd4"
+      note:
+        ar: كل شيء في سيرفرك داخل هذا المجلد — الشخصيات، المباني، الديناصورات، والصناديق، ومجلد لكل ماب. لا تحذف ولا ترفع فوقه والسيرفر شغّال؛ استخدم النسخ الاحتياطية.
+        en: Everything on your server lives in this folder — characters, buildings, dinos and boxes, one folder per map. Never delete it or upload over it while the server is up; use the backups instead.
+    - match: ShooterGame/Saved/AllowedCheaterAccountIDs.txt
+      label:
+        ar: الأدمنية
+        en: Admins
+      icon: shield
+      color: "#8a6fd4"
+      restart: true
+      note:
+        ar: أرقام الحسابات اللي تصير أدمن بدون ما تكتب كلمة مرور. رقم واحد في كل سطر، وعدّلها من صفحة اللاعبين أحسن.
+        en: The account ids that become admin without typing a password. One id per line, and the Players page is the better place to edit it.
+    - match: ShooterGame/Binaries/Win64/PlayersExclusiveJoinList.txt
+      label:
+        ar: القائمة البيضاء
+        en: Whitelist
+      icon: users
+      color: "#8a6fd4"
+      restart: true
+      note:
+        ar: لما تشغّل الدخول الحصري، ما يدخل سيرفرك إلا الأرقام اللي في هذا الملف. رقم واحد في كل سطر.
+        en: With exclusive join switched on, only the ids in this file can enter your server. One id per line.
+    - match: ShooterGame/Saved/Logs
+      label:
+        ar: السجلات
+        en: Logs
+      icon: box
+      color: "#7a8290"
+      note:
+        ar: سجلات سيرفرك، ومنها نقرأ الكونسول والأحداث. تكبر مع الوقت، احذفها متى ما تبي.
+        en: Your server logs — this is where the console and the events are read from. They grow over time; delete them whenever you like.
+
+guideTags:
+  - id: start
+    name:
+      ar: ابدأ من هنا
+      en: Start here
+  - id: mods
+    name:
+      ar: المودات
+      en: Mods
+  - id: maps
+    name:
+      ar: المابات
+      en: Maps
+  - id: admin
+    name:
+      ar: الأدمن
+      en: Admin
+
+guides:
+  - id: getting-started
+    title:
+      ar: البدء بسيرفرك
+      en: Getting started
+    summary:
+      ar: شغّل سيرفر آرك، ادخله مع أصحابك، وصير أدمن فيه.
+      en: Get your ARK server running, join it with friends, and make yourself admin.
+    tags:
+      - start
+    surfaces:
+      - overview
+      - setup
+    bodyPath:
+      ar: guides/getting-started/ar.md
+      en: guides/getting-started/en.md
+  - id: mods
+    title:
+      ar: المودات من CurseForge
+      en: Mods from CurseForge
+    summary:
+      ar: ركّب مودات، رتّبها، وخل سيرفرك ينزّلها بنفسه.
+      en: Install mods, order them, and let your server download them itself.
+    tags:
+      - mods
+    surfaces:
+      - panel
+    bodyPath:
+      ar: guides/mods/ar.md
+      en: guides/mods/en.md
+  - id: maps
+    title:
+      ar: المابات والتبديل بينها
+      en: Maps and switching between them
+    summary:
+      ar: المابات الرسمية، مابات المودات، وين يجلس عالم كل ماب، ومتى تسوي وايب.
+      en: The official maps, mod maps, where each map's world lives, and when to wipe.
+    tags:
+      - maps
+    surfaces:
+      - panel
+      - files
+      - backups
+    bodyPath:
+      ar: guides/maps/ar.md
+      en: guides/maps/en.md
+  - id: admin
+    title:
+      ar: الأدمن والأوامر
+      en: Admin and commands
+    summary:
+      ar: كلمة مرور الأدمن، الأدمنية بدون كلمة مرور، أوامر الكونسول، والحظر.
+      en: The admin password, admins without a password, the console commands, and bans.
+    tags:
+      - admin
+    surfaces:
+      - panel
+      - console
+    bodyPath:
+      ar: guides/admin/ar.md
+      en: guides/admin/en.md
