@@ -43,6 +43,8 @@ A mod map takes two steps together:
 
 Mods download into `ShooterGame/Binaries/Win64/ShooterGame/Mods/83374/`, one folder each, named `modId_fileId`. Do not edit them by hand — your server fetches them again on every start.
 
+What we keep is the mod list itself, not the mod files, so a backup carries the list alone; restoring one has your server download the mods again on its first start, and a reset clears the list and starts you from nothing.
+
 > [!danger] If you remove a mod that added items or dinos, everything your players built with it disappears from the world. Take a backup before any removal.
 
 @[open](backups)

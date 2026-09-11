@@ -5,7 +5,7 @@ import { BridgeSetupStepKind } from "@serverkgg/bridge/protocol";
 import { RCON_ACCESS_MODULE } from "@serverkgg/bridge/rcon";
 import { compileGlobs, matchesAny } from "@serverkgg/bridge/utils";
 import { driver } from "./driver";
-import { BAN_LIST_FILE, GAME_ROOTS, MODS_DIRECTORY, WHITELIST_FILE } from "./shared";
+import { BAN_LIST_FILE, GAME_ROOTS, MODS_DIRECTORY, MODS_SIDECAR_FILE, WHITELIST_FILE } from "./shared";
 
 const manifest = Bun.YAML.parse(await Bun.file("serverk.yml").text()) as {
 	backup: {
@@ -16,6 +16,9 @@ const manifest = Bun.YAML.parse(await Bun.file("serverk.yml").text()) as {
 			platform: string;
 			shmMb: number;
 		};
+	};
+	files: {
+		protected: string[];
 	};
 	reset: {
 		keep: string[];
@@ -150,15 +153,22 @@ describe("driver", () => {
 		expect(manifest.reset.keep).toContain("steamapps");
 	});
 
-	test("reset keeps the mods sidecar, because the payloads it names survive under the binaries", () => {
+	test("reset drops the mods sidecar, so it really wipes the mods the reset dialog promises to wipe", () => {
+		expect(manifest.reset.keep).not.toContain(MODS_SIDECAR_FILE);
+	});
+
+	test("reset keeps the mod payloads under the binaries, which the cleared list leaves inert", () => {
 		expect(matchesAny(MODS_DIRECTORY, compileGlobs(manifest.reset.keep))).toBe(true);
-		expect(manifest.reset.keep).toContain(".serverk-mods.json");
 	});
 
 	test("the backup names the saves and both sidecars rather than excluding the install", () => {
 		expect(manifest.backup.only).toContain("ShooterGame/Saved/**");
 		expect(manifest.backup.only).toContain(".serverk-install.json");
-		expect(manifest.backup.only).toContain(".serverk-mods.json");
+		expect(manifest.backup.only).toContain(MODS_SIDECAR_FILE);
+	});
+
+	test("the mods sidecar stays protected, so a restore is the only thing that rewrites the list", () => {
+		expect(manifest.files.protected).toContain(MODS_SIDECAR_FILE);
 	});
 
 	test("the backup carries the moderation lists the panel writes outside the saves", () => {

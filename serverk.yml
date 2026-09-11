@@ -96,7 +96,6 @@ reset:
     - ShooterGame/Binaries/**
     - ShooterGame/Content/**
     - ShooterGame/Plugins/**
-    - .serverk-mods.json
 
 presence:
   name: player

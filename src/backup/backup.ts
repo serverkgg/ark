@@ -15,15 +15,11 @@ export const backup: Bridge.Backup = {
 		}
 
 		if ((await rconSilent(context, SAVE_WORLD)) === null) {
-			context.log.warn("the world could not be saved before the backup, archiving it as it stands");
-
-			return;
+			throw new Error("the world could not be saved before the backup");
 		}
 
 		if ((await context.logs.watch(SAVE_LINE, SAVE_TIMEOUT_MS)) === null) {
-			context.log.warn("the world did not report itself saved before the backup");
-
-			return;
+			throw new Error("the world did not report itself saved before the backup");
 		}
 
 		context.log("saved the world before the backup");

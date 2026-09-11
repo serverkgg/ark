@@ -254,8 +254,8 @@ const modsTab: Bridge.Tab = {
 				en: "No mods yet. Find one above and stage it; your server downloads it itself on the next start.",
 			},
 			help: {
-				ar: "إحنا نسجّل رقم المود بس؛ سيرفرك هو اللي ينزّله من CurseForge أول تشغيل بعد التغيير، فأول تشغيل بعد إضافة مودات يطوّل شوي.",
-				en: "We only record the mod's id; your server pulls it from CurseForge itself on the next start, so the first boot after adding mods takes longer.",
+				ar: "إحنا نسجّل رقم المود بس؛ سيرفرك هو اللي ينزّله من CurseForge أول تشغيل بعد التغيير، فأول تشغيل بعد إضافة مودات يطوّل شوي. والنسخة الاحتياطية تحفظ القائمة مو ملفات المودات، فلما ترجّع نسخة سيرفرك ينزّلها من جديد أول تشغيل، وإعادة التصفير تمسح القائمة كلها.",
+				en: "We only record the mod's id; your server pulls it from CurseForge itself on the next start, so the first boot after adding mods takes longer. A backup keeps that list rather than the mod files, so restoring one has your server download them again on its first start — and a reset clears the list.",
 			},
 			id: "catalog",
 			layout: BridgeLayout.Catalog,
