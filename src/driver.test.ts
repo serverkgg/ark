@@ -126,6 +126,90 @@ describe("driver", () => {
 		}
 	});
 
+	test("protects exactly the stopped-server mutations that rewrite the world or the mod list", () => {
+		const protectedOf = (id: string) => {
+			const module = driver.modules?.[id];
+
+			return module && "protectedActions" in module ? (module.protectedActions ?? []) : [];
+		};
+
+		expect(protectedOf("saves")).toEqual([
+			"wipe",
+		]);
+		expect(protectedOf("mods")).toEqual([
+			"install",
+			"remove",
+			"toggle",
+		]);
+		expect(protectedOf("modOrder")).toEqual([
+			"add",
+			"up",
+			"down",
+			"remove",
+			"toggle",
+		]);
+
+		for (const id of [
+			"admin",
+			"admins",
+			"bans",
+			"settings",
+			"whitelist",
+		]) {
+			expect(protectedOf(id)).toEqual([]);
+		}
+	});
+
+	test("every protected action is a mutation the module declares and runs while stopped", () => {
+		for (const [id, module] of Object.entries(driver.modules ?? {})) {
+			const declared =
+				module.kind === BridgeKind.Collection
+					? [
+							...(module.add
+								? [
+										"add",
+									]
+								: []),
+							...Object.keys(module.actions ?? {}),
+						]
+					: module.kind === BridgeKind.Catalog
+						? [
+								"install",
+								"remove",
+								...(module.toggle
+									? [
+											"toggle",
+										]
+									: []),
+							]
+						: [];
+			const protectedActions = "protectedActions" in module ? (module.protectedActions ?? []) : [];
+
+			if (protectedActions.length === 0) {
+				continue;
+			}
+
+			expect("requiresRunning" in module ? module.requiresRunning : undefined, id).toBeFalsy();
+
+			for (const action of protectedActions) {
+				expect(declared, id).toContain(action);
+			}
+		}
+	});
+
+	test("gives the roster, the metrics and the admin card a help line in both languages", () => {
+		for (const id of [
+			"online",
+			"metrics",
+			"admin",
+		]) {
+			const section = sections().find((entry) => entry.id === id);
+
+			expect(section?.help?.ar.length ?? 0).toBeGreaterThan(0);
+			expect(section?.help?.en.length ?? 0).toBeGreaterThan(0);
+		}
+	});
+
 	test("puts the roster on the Players page and the metrics on the Overview", () => {
 		const online = sections().find((section) => section.module === "players");
 		const metrics = sections().find((section) => section.module === "metrics");

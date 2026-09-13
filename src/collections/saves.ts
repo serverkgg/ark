@@ -102,6 +102,9 @@ const sizesOf = async (context: Bridge.Context, names: string[]): Promise<Map<st
 
 export const saves: Bridge.Collection = {
 	kind: BridgeKind.Collection,
+	protectedActions: [
+		"wipe",
+	],
 	refreshSeconds: REFRESH_SECONDS,
 	async list(context) {
 		const names = await mapNames(context);

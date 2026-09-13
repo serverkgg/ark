@@ -411,6 +411,10 @@ const playersTab: Bridge.Tab = {
 				ar: "ما فيه أحد داخل الحين.",
 				en: "Nobody is online right now.",
 			},
+			help: {
+				ar: "القائمة تتحدث كل ربع دقيقة وسيرفرك شغّال، ومنها تطرد أو تحظر أي لاعب.",
+				en: "The list refreshes every 15 seconds while your server is up, and you kick or ban any player from it.",
+			},
 			id: "online",
 			layout: BridgeLayout.Table,
 			module: "players",
@@ -566,6 +570,10 @@ const controlsTab: Bridge.Tab = {
 	id: "controls",
 	sections: [
 		{
+			help: {
+				ar: "اللاعبين والماب والمودات ونسخة اللعبة بنظرة وحدة، وتتحدث كل ربع دقيقة.",
+				en: "Players, map, mods and game build at a glance, refreshed every 15 seconds.",
+			},
 			id: "metrics",
 			layout: BridgeLayout.Detail,
 			module: "metrics",
@@ -650,6 +658,10 @@ const controlsTab: Bridge.Tab = {
 				ar: "لسا ما جهزت كلمة المرور. شغّل سيرفرك مرة وحدة.",
 				en: "The password is not ready yet. Start your server once.",
 			},
+			help: {
+				ar: "لا تعطيها إلا اللي تثق فيه: تخلي أي أحد أدمن داخل اللعبة، وتفتح له RCON إذا شغّلت الوصول عن بعد.",
+				en: "Share it only with people you trust: it makes anyone admin in game, and opens RCON to them once remote access is on.",
+			},
 			id: "admin",
 			layout: BridgeLayout.Detail,
 			module: "admin",
@@ -663,8 +675,8 @@ const controlsTab: Bridge.Tab = {
 				{
 					confirm: BridgeConfirm.Strong,
 					confirmText: {
-						ar: "نمسح عالم الماب هذي كامل — الشخصيات والمباني والديناصورات. ما فيه رجعة إلا من نسخة احتياطية.",
-						en: "We erase this map's whole world — characters, buildings and dinos. Nothing comes back except from a backup.",
+						ar: "نمسح عالم الماب هذي كامل — الشخصيات والمباني والديناصورات. نحفظ نسخة قبل المسح، ومنها ترجّع العالم لو غيّرت رأيك.",
+						en: "We erase this map's whole world — characters, buildings and dinos. We save a copy first, so you can restore the world if you change your mind.",
 					},
 					id: "wipe",
 					label: {
