@@ -126,7 +126,7 @@ describe("driver", () => {
 		}
 	});
 
-	test("protects exactly the stopped-server mutations that rewrite the world or the mod list", () => {
+	test("protects only wiping a save, the one action nothing else brings back", () => {
 		const protectedOf = (id: string) => {
 			const module = driver.modules?.[id];
 
@@ -136,23 +136,13 @@ describe("driver", () => {
 		expect(protectedOf("saves")).toEqual([
 			"wipe",
 		]);
-		expect(protectedOf("mods")).toEqual([
-			"install",
-			"remove",
-			"toggle",
-		]);
-		expect(protectedOf("modOrder")).toEqual([
-			"add",
-			"up",
-			"down",
-			"remove",
-			"toggle",
-		]);
 
 		for (const id of [
 			"admin",
 			"admins",
 			"bans",
+			"mods",
+			"modOrder",
 			"settings",
 			"whitelist",
 		]) {

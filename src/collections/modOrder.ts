@@ -38,13 +38,6 @@ const enabledOf = async (context: Bridge.Context, projectId: string) => {
 // mod the key cannot look up — and the only place the load order can be changed.
 export const modOrder: Bridge.Collection = {
 	kind: BridgeKind.Collection,
-	protectedActions: [
-		"add",
-		"up",
-		"down",
-		"remove",
-		"toggle",
-	],
 	refreshSeconds: REFRESH_SECONDS,
 	async list(context) {
 		return (await readMods(context)).mods.map(modOrderRow);

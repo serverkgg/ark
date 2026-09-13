@@ -103,11 +103,6 @@ export const stageMod = async (context: Bridge.Context, id: string): Promise<Bri
 
 export const mods: Bridge.Catalog = {
 	kind: BridgeKind.Catalog,
-	protectedActions: [
-		"install",
-		"remove",
-		"toggle",
-	],
 	pageSize: PAGE_SIZE,
 	async search(context, query) {
 		const catalog = curseforge(context);
