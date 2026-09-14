@@ -15,7 +15,7 @@ export interface ArkModOrderRow extends Bridge.Row {
 	order: number;
 	title: string;
 	projectId: string;
-	state: string;
+	state: Bridge.Text;
 }
 
 export const modOrderRow = (mod: ArkMod, index: number): ArkModOrderRow => {
@@ -23,7 +23,15 @@ export const modOrderRow = (mod: ArkMod, index: number): ArkModOrderRow => {
 		id: mod.projectId,
 		order: index + 1,
 		projectId: mod.projectId,
-		state: mod.enabled ? "enabled" : "disabled",
+		state: mod.enabled
+			? {
+					ar: "مفعّل",
+					en: "Enabled",
+				}
+			: {
+					ar: "مطفي",
+					en: "Disabled",
+				},
 		title: mod.title,
 	};
 };

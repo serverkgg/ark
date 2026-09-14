@@ -24,7 +24,7 @@ const MISSING_SAVE: Bridge.Text = {
 
 export interface ArkSaveRow extends Bridge.Row {
 	id: string;
-	map: string;
+	map: Bridge.Text;
 	size: string;
 	active: string;
 }
@@ -115,7 +115,7 @@ export const saves: Bridge.Collection = {
 			return {
 				active: name === map ? ACTIVE_MARK : "",
 				id: name,
-				map: mapNameOf(name).en,
+				map: mapNameOf(name),
 				size: megabytes(sizes.get(name)),
 			} satisfies ArkSaveRow;
 		});

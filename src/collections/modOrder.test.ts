@@ -72,14 +72,20 @@ describe("the load order table", () => {
 				id: "111111",
 				order: 1,
 				projectId: "111111",
-				state: "enabled",
+				state: {
+					ar: "مفعّل",
+					en: "Enabled",
+				},
 				title: "111111",
 			},
 			{
 				id: "222222",
 				order: 2,
 				projectId: "222222",
-				state: "disabled",
+				state: {
+					ar: "مطفي",
+					en: "Disabled",
+				},
 				title: "222222",
 			},
 		]);

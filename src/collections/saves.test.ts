@@ -70,13 +70,19 @@ describe("listing the saved worlds", () => {
 			{
 				active: "",
 				id: "Ragnarok_WP",
-				map: "Ragnarok",
+				map: {
+					ar: "راقناروك",
+					en: "Ragnarok",
+				},
 				size: "1 MB",
 			},
 			{
 				active: "✓",
 				id: "TheIsland_WP",
-				map: "The Island",
+				map: {
+					ar: "ذا آيلاند",
+					en: "The Island",
+				},
 				size: "2 MB",
 			},
 		]);
