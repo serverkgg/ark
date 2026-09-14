@@ -84,6 +84,7 @@ backup:
     - ShooterGame/Saved/Logs/**
     - ShooterGame/Saved/Crashes/**
     - ShooterGame/Saved/Config/CrashReportClient/**
+    - ShooterGame/Saved/SavedArks/**/*_??.??.????_??.??.??.ark
 
 reset:
   keep:
