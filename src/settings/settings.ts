@@ -1,13 +1,18 @@
 import { type Bridge, BridgeKind } from "@serverkgg/bridge";
 import {
+	ArkSettingKind,
+	type ArkSettingsBaseline,
 	flattenPending,
 	forgetPendingSettings,
 	mergeIniSection,
 	readArkStamp,
 	readIniSection,
 	recordPendingSettings,
+	SETTING_BY_KEY,
 	SETTINGS_SECTIONS,
+	secretBaseline,
 	settingsByFile,
+	settingText,
 	settingUpdates,
 	settingValues,
 	validateSettingsWrite,
@@ -27,13 +32,51 @@ const storedSettings = async (context: Bridge.Context): Promise<Record<string, s
 	return stored;
 };
 
+const baselineFor = async (
+	context: Bridge.Context,
+	updates: Record<string, string>,
+): Promise<ArkSettingsBaseline | null> => {
+	try {
+		const shown = settingValues(await storedSettings(context));
+		const baseline: ArkSettingsBaseline = {};
+
+		for (const [key, submitted] of Object.entries(updates)) {
+			const setting = SETTING_BY_KEY.get(key);
+			const value = shown[key];
+
+			if (setting === undefined || value === undefined) {
+				continue;
+			}
+
+			const current = settingText(setting, value);
+
+			baseline[key] =
+				setting.kind === ArkSettingKind.Secret
+					? secretBaseline(current, submitted)
+					: {
+							value: current,
+						};
+		}
+
+		return baseline;
+	} catch (error) {
+		context.log.warn("the settings could not be read before the write, the next start reports every parked key", {
+			error: error instanceof Error ? error.message : String(error),
+		});
+
+		return null;
+	}
+};
+
 export const settings: Bridge.Settings = {
 	kind: BridgeKind.Settings,
 	async read(context) {
 		return settingValues(await storedSettings(context));
 	},
 	async write(context, values) {
-		const patches = settingsByFile(settingUpdates(validateSettingsWrite(values)));
+		const updates = settingUpdates(validateSettingsWrite(values));
+		const patches = settingsByFile(updates);
+		const before = context.server.running ? await baselineFor(context, updates) : null;
 
 		// Writing the files now keeps a stopped server correct at once; a running one
 		// rewrites them from memory when it exits, which is what the parking is for.
@@ -42,7 +85,7 @@ export const settings: Bridge.Settings = {
 		}
 
 		if (context.server.running) {
-			await recordPendingSettings(context, patches);
+			await recordPendingSettings(context, patches, before);
 
 			return;
 		}

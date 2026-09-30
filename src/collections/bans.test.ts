@@ -25,8 +25,14 @@ const harness = (options: { running: boolean; banned?: string[] }) => {
 
 	const sent: string[] = [];
 	const emitted: string[] = [];
+	const reported: Bridge.Activity[] = [];
 
 	const context = {
+		activity: {
+			report(entry: Bridge.Activity) {
+				reported.push(entry);
+			},
+		},
 		emit(event: string) {
 			emitted.push(event);
 		},
@@ -74,6 +80,7 @@ const harness = (options: { running: boolean; banned?: string[] }) => {
 		file() {
 			return files.get(BAN_LIST_FILE) ?? "";
 		},
+		reported,
 		sent,
 	};
 };
@@ -225,5 +232,55 @@ describe("lifting a ban", () => {
 
 		expect(sent).toEqual([]);
 		expect(file()).toBe(`${SECOND}\n`);
+	});
+});
+
+describe("the activity a ban change reports", () => {
+	test("names the banned account and keeps the event beside it", async () => {
+		const { context, emitted, reported } = harness({
+			running: true,
+		});
+
+		await bans.add?.(context, FIRST);
+
+		expect(emitted).toEqual([
+			BridgeEventName.PlayerBanned,
+		]);
+		expect(reported).toMatchObject([
+			{
+				details: {
+					eosId: FIRST,
+				},
+				name: BridgeEventName.PlayerBanned,
+				subject: FIRST,
+			},
+		]);
+		expect(JSON.stringify(reported)).not.toContain("live");
+	});
+
+	test("reports a lifted ban as an unban of that account", async () => {
+		const { context, reported } = harness({
+			banned: [
+				FIRST,
+			],
+			running: false,
+		});
+
+		await bans.actions?.remove?.(
+			context,
+			{
+				eosId: FIRST,
+				id: FIRST,
+			},
+			{},
+		);
+
+		expect(reported).toMatchObject([
+			{
+				name: BridgeEventName.PlayerUnbanned,
+				subject: FIRST,
+			},
+		]);
+		expect(JSON.stringify(reported)).not.toContain("live");
 	});
 });

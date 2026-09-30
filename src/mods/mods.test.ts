@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { CURSEFORGE_SECRET } from "@serverkgg/bridge/catalogs";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { MOD_LIST_LIMIT, MODS_DIRECTORY, MODS_SIDECAR_FILE, readMods } from "../shared";
 import { mods } from "./mods";
 import { CURSEFORGE_PROVIDER, NOT_READY_NOTE } from "./modsCurseforge";
@@ -43,8 +44,14 @@ const harness = (
 	}
 
 	const warnings: string[] = [];
+	const reported: Bridge.Activity[] = [];
 
 	const context = {
+		activity: {
+			report(entry: Bridge.Activity) {
+				reported.push(entry);
+			},
+		},
 		files: {
 			async ensure() {
 				return;
@@ -77,6 +84,7 @@ const harness = (
 
 	return {
 		context,
+		reported,
 		warnings,
 	};
 };
@@ -229,5 +237,55 @@ describe("removing and toggling", () => {
 		await mods.toggle?.(context, "111111", false);
 
 		expect((await readMods(context)).mods.at(0)?.enabled).toBe(false);
+	});
+});
+
+describe("the activity the catalog reports", () => {
+	test("reports a staged mod as enabled and downloading on the next start, never as installed", async () => {
+		const { context, reported } = harness({
+			key: "curseforge-key-never-shown",
+		});
+
+		await mods.install(context, "928437");
+		await mods.install(context, "928437");
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					projectId: "928437",
+					staged: true,
+				},
+				name: BridgeEventName.ModEnabled,
+				subject: "928437",
+			},
+		]);
+		expect(reported.at(0)?.text.en).toContain("downloads on the next start");
+		expect(JSON.stringify(reported)).not.toContain("curseforge-key-never-shown");
+	});
+
+	test("names the staged title on removal and on a toggle", async () => {
+		const { context, reported } = harness({
+			mods: [
+				{
+					projectId: "111111",
+					title: "Structures Plus",
+				},
+			],
+		});
+
+		await mods.toggle?.(context, "111111", false);
+		await mods.toggle?.(context, "111111", false);
+		await mods.remove(context, "111111");
+
+		expect(reported).toMatchObject([
+			{
+				name: BridgeEventName.ModDisabled,
+				subject: "Structures Plus",
+			},
+			{
+				name: BridgeEventName.ModRemoved,
+				subject: "Structures Plus",
+			},
+		]);
 	});
 });

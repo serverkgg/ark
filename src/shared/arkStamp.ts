@@ -1,5 +1,6 @@
 import type { Bridge } from "@serverkgg/bridge";
 import { readStamp, writeStamp } from "@serverkgg/bridge/install";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { generateToken } from "@serverkgg/bridge/utils";
 import { ADMIN_PASSWORD_LENGTH } from "./arkApp";
 
@@ -9,6 +10,16 @@ export type ArkPendingFile = Record<string, ArkPendingSection>;
 
 export type ArkPendingSettings = Record<string, ArkPendingFile>;
 
+export type ArkBaselineValue =
+	| {
+			value: string;
+	  }
+	| {
+			changed: boolean;
+	  };
+
+export type ArkSettingsBaseline = Record<string, ArkBaselineValue>;
+
 export interface ArkStamp {
 	buildId: string | null;
 	adminPassword: string;
@@ -17,12 +28,16 @@ export interface ArkStamp {
 	// while the server is up is also parked here and laid back over the file before the
 	// next start. Without the replay the write is silently thrown away.
 	settingsPending: ArkPendingSettings;
+	settingsBaseline: ArkSettingsBaseline;
+	launch: Record<string, string>;
 }
 
 export const EMPTY_STAMP: ArkStamp = {
 	adminPassword: "",
 	adminPasswordNext: null,
 	buildId: null,
+	launch: {},
+	settingsBaseline: {},
 	settingsPending: {},
 };
 
@@ -80,11 +95,57 @@ export const normalizePending = (value: unknown): ArkPendingSettings => {
 	return pending;
 };
 
+const baselineValueOf = (value: unknown): ArkBaselineValue | null => {
+	if (typeof value !== "object" || value === null || Array.isArray(value)) {
+		return null;
+	}
+
+	if ("changed" in value && typeof value.changed === "boolean") {
+		return {
+			changed: value.changed,
+		};
+	}
+
+	if ("digest" in value) {
+		return {
+			changed: true,
+		};
+	}
+
+	if ("value" in value && typeof value.value === "string") {
+		return {
+			value: value.value,
+		};
+	}
+
+	return null;
+};
+
+export const normalizeBaseline = (value: unknown): ArkSettingsBaseline => {
+	if (typeof value !== "object" || value === null || Array.isArray(value)) {
+		return {};
+	}
+
+	const baseline: ArkSettingsBaseline = {};
+
+	for (const [key, entry] of Object.entries(value)) {
+		const normalized = baselineValueOf(entry);
+
+		if (normalized !== null) {
+			baseline[key] = normalized;
+		}
+	}
+
+	return baseline;
+};
+
 export const normalizeStamp = (raw: Partial<ArkStamp> | null): ArkStamp => {
 	return {
 		adminPassword: stringOr(raw?.adminPassword, ""),
 		adminPasswordNext: nullableString(raw?.adminPasswordNext),
 		buildId: nullableString(raw?.buildId),
+		launch: stringRecord(raw?.launch),
+		settingsBaseline: normalizeBaseline(raw?.settingsBaseline),
 		settingsPending: normalizePending(raw?.settingsPending),
 	};
 };
@@ -119,8 +180,25 @@ export const promoteAdminPassword = async (context: Bridge.Context, stamp: ArkSt
 	});
 };
 
+export const ADMIN_PASSWORD_TARGET = "admin-password";
+
+export const RCON_PASSWORD_TARGET = "rcon-password";
+
 export const rotateAdminPassword = async (context: Bridge.Context) => {
 	await patchArkStamp(context, {
 		adminPasswordNext: generateToken(ADMIN_PASSWORD_LENGTH),
+	});
+};
+
+export const reportAdminPasswordRotated = (context: Bridge.Context, target: string) => {
+	context.activity.report({
+		details: {
+			target,
+		},
+		name: BridgeEventName.SecretRotated,
+		text: {
+			ar: "تم تغيير كلمة مرور الأدمن وكلمة مرور RCON معها، والتغيير ينطبق مع التشغيل الجاي",
+			en: "Changed the admin password and the RCON password with it, takes effect on the next start",
+		},
 	});
 };

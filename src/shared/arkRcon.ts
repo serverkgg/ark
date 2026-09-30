@@ -61,7 +61,9 @@ export const rconCommand = async (context: Bridge.Context, input: string): Promi
 				error: error.message,
 			});
 
-			throw new BridgeUserError(RCON_UNREACHABLE);
+			throw new BridgeUserError(RCON_UNREACHABLE, {
+				cause: error,
+			});
 		}
 
 		throw error;

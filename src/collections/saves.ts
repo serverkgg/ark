@@ -1,4 +1,5 @@
 import { type Bridge, BridgeKind, BridgeUserError } from "@serverkgg/bridge";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { execDetail } from "@serverkgg/bridge/utils";
 import { mapNameOf, readLaunchVariables, SAVED_ARKS_DIRECTORY, savedArkDirectory } from "../shared";
 
@@ -20,6 +21,13 @@ const MUST_BE_STOPPED: Bridge.Text = {
 const MISSING_SAVE: Bridge.Text = {
 	ar: "عالم الماب هذي ما عاد موجود.",
 	en: "That map's world is not there any more.",
+};
+
+export const worldWipedText = (map: Bridge.Text): Bridge.Text => {
+	return {
+		ar: `تم وايب ماب ${map.ar}، والتشغيل الجاي عليه يبدأ من جديد`,
+		en: `Wiped ${map.en}, the next start on that map begins fresh`,
+	};
 };
 
 export interface ArkSaveRow extends Bridge.Row {
@@ -140,6 +148,18 @@ export const saves: Bridge.Collection = {
 
 			context.log("wiped a map's world from the panel", {
 				map: row.id,
+			});
+
+			const map = mapNameOf(row.id);
+
+			context.activity.report({
+				details: {
+					map: row.id,
+					world: map.en,
+				},
+				name: BridgeEventName.WorldWiped,
+				subject: map.en,
+				text: worldWipedText(map),
 			});
 		},
 	},

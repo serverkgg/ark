@@ -26,16 +26,50 @@ const presenceFor = (row: Bridge.Row): Bridge.Values => {
 	};
 };
 
+const nameOf = (row: Bridge.Row, eosId: string) => {
+	const name = String(row.name ?? "").trim();
+
+	return name.length > 0 ? name : eosId;
+};
+
 export const kickPlayer = async (context: Bridge.Context, row: Bridge.Row) => {
-	await rconCommand(context, kickCommand(eosIdOf(row)));
+	const eosId = eosIdOf(row);
+	const name = nameOf(row, eosId);
+
+	await rconCommand(context, kickCommand(eosId));
 
 	context.emit(BridgeEventName.PlayerKicked, presenceFor(row));
+	context.activity.report({
+		details: {
+			eosId,
+		},
+		name: BridgeEventName.PlayerKicked,
+		subject: name,
+		text: {
+			ar: `تم طرد ${name}`,
+			en: `Kicked ${name}`,
+		},
+	});
 };
 
 export const banPlayer = async (context: Bridge.Context, row: Bridge.Row) => {
-	await rconCommand(context, banCommand(eosIdOf(row)));
+	const eosId = eosIdOf(row);
+	const name = nameOf(row, eosId);
+
+	await rconCommand(context, banCommand(eosId));
 
 	context.emit(BridgeEventName.PlayerBanned, presenceFor(row));
+	context.activity.report({
+		details: {
+			eosId,
+		},
+		name: BridgeEventName.PlayerBanned,
+		subject: name,
+		text: {
+			ar: `تم حظر ${name}`,
+			en: `Banned ${name}`,
+		},
+	});
 };
 
 export const players: Bridge.Collection = {

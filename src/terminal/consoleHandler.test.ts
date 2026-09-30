@@ -22,8 +22,14 @@ const handlerContext = (replies: Record<string, string>) => {
 			}),
 		],
 	]);
+	const reported: Bridge.Activity[] = [];
 
 	const context = {
+		activity: {
+			report(entry: Bridge.Activity) {
+				reported.push(entry);
+			},
+		},
 		emit(event: string, payload?: Bridge.Values) {
 			emitted.push({
 				event,
@@ -68,6 +74,7 @@ const handlerContext = (replies: Record<string, string>) => {
 	return {
 		context,
 		emitted,
+		reported,
 		sent,
 	};
 };

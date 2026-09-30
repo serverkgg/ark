@@ -57,6 +57,8 @@ describe("normalizeStamp", () => {
 			adminPassword: "",
 			adminPasswordNext: null,
 			buildId: null,
+			launch: {},
+			settingsBaseline: {},
 			settingsPending: {},
 		});
 	});

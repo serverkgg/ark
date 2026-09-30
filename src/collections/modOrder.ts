@@ -1,5 +1,19 @@
 import { type Bridge, BridgeKind, BridgeUserError } from "@serverkgg/bridge";
-import { type ArkMod, addMod, moveMod, readMods, removeMod, requireProjectId, toggleMod } from "../shared";
+import {
+	type ArkMod,
+	addMod,
+	findMod,
+	modPosition,
+	moveMod,
+	readMods,
+	removeMod,
+	reportModMoved,
+	reportModRemoved,
+	reportModStaged,
+	reportModToggled,
+	requireProjectId,
+	toggleMod,
+} from "../shared";
 
 const REFRESH_SECONDS = 60;
 
@@ -36,10 +50,15 @@ export const modOrderRow = (mod: ArkMod, index: number): ArkModOrderRow => {
 	};
 };
 
-const enabledOf = async (context: Bridge.Context, projectId: string) => {
-	const mod = (await readMods(context)).mods.find((entry) => entry.projectId === projectId);
+const move = async (context: Bridge.Context, projectId: string, offset: number) => {
+	const before = await modPosition(context, projectId);
+	const sidecar = await moveMod(context, projectId, offset);
+	const after = sidecar.mods.findIndex((entry) => entry.projectId === projectId);
+	const mod = sidecar.mods[after];
 
-	return mod?.enabled ?? true;
+	if (mod !== undefined && before !== null && after !== before) {
+		reportModMoved(context, mod, after + 1);
+	}
 };
 
 // The web catalog installs from search results only, so this table is the way in for a
@@ -56,6 +75,7 @@ export const modOrder: Bridge.Collection = {
 		}
 
 		const projectId = requireProjectId(input);
+		const staged = await findMod(context, projectId);
 
 		await addMod(context, {
 			addedAt: new Date().toISOString(),
@@ -69,22 +89,42 @@ export const modOrder: Bridge.Collection = {
 		context.log("staged a mod by its id, the server downloads it on the next start", {
 			mod: projectId,
 		});
+
+		if (staged === null) {
+			reportModStaged(context, {
+				projectId,
+				title: projectId,
+			});
+		}
 	},
 	actions: {
 		async down(context, row) {
-			await moveMod(context, row.id, 1);
+			await move(context, row.id, 1);
 		},
 
 		async remove(context, row) {
+			const mod = await findMod(context, row.id);
+
 			await removeMod(context, row.id);
+
+			if (mod !== null) {
+				reportModRemoved(context, mod);
+			}
 		},
 
 		async toggle(context, row) {
-			await toggleMod(context, row.id, !(await enabledOf(context, row.id)));
+			const mod = await findMod(context, row.id);
+			const enabled = !(mod?.enabled ?? true);
+
+			await toggleMod(context, row.id, enabled);
+
+			if (mod !== null) {
+				reportModToggled(context, mod, enabled);
+			}
 		},
 
 		async up(context, row) {
-			await moveMod(context, row.id, -1);
+			await move(context, row.id, -1);
 		},
 	},
 };

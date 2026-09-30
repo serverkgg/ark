@@ -1,4 +1,4 @@
-import { type Bridge, BridgeKind } from "@serverkgg/bridge";
+import { type Bridge, BridgeKind, BridgeUserError } from "@serverkgg/bridge";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { ANONYMOUS_LOGIN, createSteamcmd, missingGameRoots, SteamcmdPlatform } from "@serverkgg/bridge/steam";
 import { generateToken } from "@serverkgg/bridge/utils";
@@ -21,6 +21,11 @@ import { seedConfig } from "./seedConfig";
 
 const LABEL = "ARK: Survival Ascended";
 
+export const GAME_FILES_MISSING: Bridge.Text = {
+	ar: "التنزيل خلص بس ملفات اللعبة ناقصة. جرّب التثبيت مرة ثانية.",
+	en: "The download finished but the game files are missing. Try the install again.",
+};
+
 export const steamcmdFor = (context: Bridge.Context) => {
 	return createSteamcmd(context, {
 		appId: STEAM_APP_ID,
@@ -39,6 +44,78 @@ const seedAdminPassword = async (context: Bridge.Context, stamp: ArkStamp): Prom
 
 	return await patchArkStamp(context, {
 		adminPassword: generateToken(ADMIN_PASSWORD_LENGTH),
+	});
+};
+
+export const requireGameFiles = async (context: Bridge.Context) => {
+	const unrepaired = await missingGameRoots(context, GAME_ROOTS);
+
+	if (unrepaired.length > 0) {
+		throw new BridgeUserError(GAME_FILES_MISSING, {
+			cause: new Error(`steamcmd finished but ${unrepaired.join(", ")} is missing`),
+		});
+	}
+};
+
+export const recordBuild = async (context: Bridge.Context, stamp: ArkStamp, buildId: string | null) => {
+	if (buildId === null) {
+		context.log.warn(
+			"steam finished without naming a build, so this install stays on the build the stamp already holds",
+			{
+				app: STEAM_APP_ID,
+				build: stamp.buildId,
+			},
+		);
+
+		return;
+	}
+
+	if (stamp.buildId !== null && stamp.buildId !== buildId) {
+		context.log("the server moved to a newer ARK build", {
+			from: stamp.buildId,
+			to: buildId,
+		});
+		context.emit(BridgeEventName.ServerUpdated, {
+			from: stamp.buildId,
+			to: buildId,
+		});
+	}
+
+	if (buildId === stamp.buildId) {
+		return;
+	}
+
+	await patchArkStamp(context, {
+		buildId,
+	});
+
+	if (stamp.buildId !== null) {
+		context.activity.report({
+			details: {
+				from: stamp.buildId,
+				to: buildId,
+			},
+			name: BridgeEventName.ServerUpdated,
+			subject: buildId,
+			text: {
+				ar: `تم تحديث آرك من البيلد ${stamp.buildId} إلى ${buildId}`,
+				en: `Updated ARK from build ${stamp.buildId} to ${buildId}`,
+			},
+		});
+	}
+};
+
+export const reportGameInstalled = (context: Bridge.Context, buildId: string | null) => {
+	context.activity.report({
+		details: {
+			build: buildId,
+		},
+		name: BridgeEventName.GameInstalled,
+		subject: LABEL,
+		text: {
+			ar: "تم تثبيت آرك سيرفايفل أسندد، والسيرفر جاهز يشتغل",
+			en: "Installed ARK: Survival Ascended, the server is ready to start",
+		},
 	});
 };
 
@@ -68,11 +145,7 @@ export const install: Bridge.Install = {
 			validate: fresh,
 		});
 
-		const unrepaired = await missingGameRoots(context, GAME_ROOTS);
-
-		if (unrepaired.length > 0) {
-			throw new Error(`steamcmd finished but ${unrepaired.join(", ")} is missing`);
-		}
+		await requireGameFiles(context);
 
 		// No linkSteamClient: the payload is the Windows build, and the Linux steamclient
 		// shared objects it would drop are read by nothing here. Proton needs its own
@@ -89,38 +162,16 @@ export const install: Bridge.Install = {
 
 		const buildId = await steam.buildId();
 
-		if (buildId === null) {
-			context.log.warn(
-				"steam finished without naming a build, so this install stays on the build the stamp already holds",
-				{
-					app: STEAM_APP_ID,
-					build: seeded.buildId,
-				},
-			);
-		}
-
-		if (buildId !== null && seeded.buildId !== null && seeded.buildId !== buildId) {
-			context.log("the server moved to a newer ARK build", {
-				from: seeded.buildId,
-				to: buildId,
-			});
-
-			context.emit(BridgeEventName.ServerUpdated, {
-				build: buildId,
-				previous: seeded.buildId,
-			});
-		}
-
-		if (buildId !== null && buildId !== seeded.buildId) {
-			await patchArkStamp(context, {
-				buildId,
-			});
-		}
+		await recordBuild(context, seeded, buildId);
 
 		context.log("install complete", {
 			app: STEAM_APP_ID,
 			build: buildId,
 		});
+
+		if (fresh && stamp.buildId === null) {
+			reportGameInstalled(context, buildId);
+		}
 	},
 	async describe(context) {
 		const stamp = await readArkStamp(context);

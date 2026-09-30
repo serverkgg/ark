@@ -1,5 +1,11 @@
 import { type Bridge, BridgeDetailFormat, BridgeDetailTone, BridgeKind } from "@serverkgg/bridge";
-import { type ArkStamp, readArkStamp, rotateAdminPassword } from "../shared";
+import {
+	ADMIN_PASSWORD_TARGET,
+	type ArkStamp,
+	readArkStamp,
+	reportAdminPasswordRotated,
+	rotateAdminPassword,
+} from "../shared";
 
 const DETAIL_ID = "admin";
 
@@ -95,6 +101,7 @@ export const admin: Bridge.Detail = {
 			await rotateAdminPassword(context);
 
 			context.log("rotated the admin password, it goes live on the next start");
+			reportAdminPasswordRotated(context, ADMIN_PASSWORD_TARGET);
 
 			return null;
 		},

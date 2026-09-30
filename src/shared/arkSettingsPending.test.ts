@@ -1,16 +1,21 @@
 import { describe, expect, test } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
+import { sameSettingValue } from "@serverkgg/bridge/utils";
 import { GAME_USER_SETTINGS_FILE, SERVER_SETTINGS_SECTION } from "./arkApp";
 import {
+	changedPendingKeys,
 	flattenPending,
 	forgetPending,
 	forgetPendingSettings,
+	mergeBaseline,
 	mergePending,
 	pendingCount,
 	pendingFor,
 	recordPendingSettings,
 	replayPendingSettings,
+	secretBaseline,
 } from "./arkSettingsPending";
 import { readArkStamp } from "./arkStamp";
 
@@ -28,8 +33,14 @@ const pendingContext = () => {
 			}),
 		],
 	]);
+	const reported: Bridge.Activity[] = [];
 
 	const context = {
+		activity: {
+			report(entry: Bridge.Activity) {
+				reported.push(entry);
+			},
+		},
 		codec: {
 			ini: {
 				async merge(
@@ -73,6 +84,7 @@ const pendingContext = () => {
 	return {
 		context,
 		merged,
+		reported,
 	};
 };
 
@@ -290,6 +302,281 @@ describe("record then replay", () => {
 		await replayPendingSettings(context, await readArkStamp(context));
 
 		expect(merged).toEqual([]);
+	});
+});
+
+describe("the activity a replay reports", () => {
+	test("reports every pending key of a stamp written before the baseline existed, and still starts", async () => {
+		const { context, merged, reported } = pendingContext();
+
+		await context.files.write(
+			INSTALL_STAMP_FILE,
+			JSON.stringify({
+				adminPassword: "live",
+				settingsPending: {
+					[GAME_USER_SETTINGS_FILE]: {
+						[SERVER_SETTINGS_SECTION]: {
+							ServerPassword: "join-password-never-shown",
+							XPMultiplier: "2",
+						},
+					},
+				},
+			}),
+		);
+
+		await replayPendingSettings(context, await readArkStamp(context));
+
+		expect(merged).toHaveLength(1);
+		expect(reported).toMatchObject([
+			{
+				details: {
+					count: 2,
+					keys: "ServerPassword, XPMultiplier",
+				},
+				name: BridgeEventName.SettingsApplied,
+			},
+		]);
+		expect(JSON.stringify(reported)).not.toContain("join-password-never-shown");
+		expect(JSON.stringify(reported)).not.toContain("live");
+		expect(await readArkStamp(context)).toMatchObject({
+			settingsBaseline: {},
+			settingsPending: {},
+		});
+	});
+
+	test("reports nothing when the cleared stamp cannot be written", async () => {
+		const { context, reported } = pendingContext();
+
+		await recordPendingSettings(context, [
+			{
+				file: GAME_USER_SETTINGS_FILE,
+				section: SERVER_SETTINGS_SECTION,
+				values: {
+					XPMultiplier: "2",
+				},
+			},
+		]);
+
+		const stamp = await readArkStamp(context);
+
+		context.files.write = async () => {
+			throw new Error("the volume is read-only");
+		};
+
+		await expect(replayPendingSettings(context, stamp)).rejects.toThrow();
+
+		expect(reported).toEqual([]);
+	});
+
+	test("reports nothing when there is nothing parked", async () => {
+		const { context, reported } = pendingContext();
+
+		await replayPendingSettings(context, await readArkStamp(context));
+
+		expect(reported).toEqual([]);
+	});
+});
+
+describe("the baseline a pending write keeps", () => {
+	const patch = (values: Record<string, string>) => {
+		return [
+			{
+				file: GAME_USER_SETTINGS_FILE,
+				section: SERVER_SETTINGS_SECTION,
+				values,
+			},
+		];
+	};
+
+	test("keeps the first baseline of a key that is already pending", () => {
+		const first = mergeBaseline(
+			{},
+			{},
+			patch({
+				XPMultiplier: "2",
+			}),
+			{
+				XPMultiplier: {
+					value: "1",
+				},
+			},
+		);
+		const second = mergeBaseline(
+			first,
+			mergePending(
+				{},
+				patch({
+					XPMultiplier: "2",
+				}),
+			),
+			patch({
+				XPMultiplier: "3",
+			}),
+			{
+				XPMultiplier: {
+					value: "2",
+				},
+			},
+		);
+
+		expect(second).toEqual({
+			XPMultiplier: {
+				value: "1",
+			},
+		});
+	});
+
+	test("keeps only whether a secret differed, never its value or a digest", () => {
+		const entry = secretBaseline("old-join-password", "new-join-password");
+
+		expect(entry).toEqual({
+			changed: true,
+		});
+		expect(secretBaseline("same-password", "same-password")).toEqual({
+			changed: false,
+		});
+		expect(
+			changedPendingKeys(
+				mergePending(
+					{},
+					patch({
+						ServerPassword: "new-join-password",
+					}),
+				),
+				{
+					ServerPassword: entry,
+				},
+			),
+		).toEqual([
+			"ServerPassword",
+		]);
+	});
+
+	test("lets a later save turn a secret's flag on but never off", () => {
+		const pending = mergePending(
+			{},
+			patch({
+				ServerPassword: "p",
+			}),
+		);
+		const unchanged = {
+			ServerPassword: {
+				changed: false,
+			},
+		};
+		const changed = {
+			ServerPassword: {
+				changed: true,
+			},
+		};
+
+		expect(
+			mergeBaseline(
+				unchanged,
+				pending,
+				patch({
+					ServerPassword: "q",
+				}),
+				changed,
+			),
+		).toEqual(changed);
+		expect(
+			mergeBaseline(
+				changed,
+				pending,
+				patch({
+					ServerPassword: "p",
+				}),
+				unchanged,
+			),
+		).toEqual(changed);
+	});
+
+	test("reads a digest left by an earlier build as changed, never as an error", async () => {
+		const { context, reported } = pendingContext();
+
+		await context.files.write(
+			INSTALL_STAMP_FILE,
+			JSON.stringify({
+				adminPassword: "live",
+				settingsBaseline: {
+					ServerPassword: {
+						digest: "0f4d1c",
+					},
+				},
+				settingsPending: {
+					[GAME_USER_SETTINGS_FILE]: {
+						[SERVER_SETTINGS_SECTION]: {
+							ServerPassword: "p",
+						},
+					},
+				},
+			}),
+		);
+
+		expect((await readArkStamp(context)).settingsBaseline).toEqual({
+			ServerPassword: {
+				changed: true,
+			},
+		});
+
+		await replayPendingSettings(context, await readArkStamp(context));
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					keys: "ServerPassword",
+				},
+			},
+		]);
+	});
+
+	test("compares a plain baseline the way the bridge compares settings", () => {
+		expect(
+			changedPendingKeys(
+				mergePending(
+					{},
+					patch({
+						Duration: "20",
+						ServerPVE: "False",
+						XPMultiplier: "2",
+					}),
+				),
+				{
+					Duration: {
+						value: "20.000000",
+					},
+					ServerPVE: {
+						value: "false",
+					},
+					XPMultiplier: {
+						value: "1",
+					},
+				},
+			),
+		).toEqual([
+			"XPMultiplier",
+		]);
+	});
+});
+
+describe("the bridge comparison the replay report relies on", () => {
+	test("reads a number the game padded as the number it is", () => {
+		expect(sameSettingValue("1", "1.000000")).toBe(true);
+		expect(sameSettingValue("2.5", "2.500000")).toBe(true);
+		expect(sameSettingValue("1", "2.000000")).toBe(false);
+	});
+
+	test("reads a boolean in any case as the same boolean", () => {
+		expect(sameSettingValue("True", "true")).toBe(true);
+		expect(sameSettingValue("False", "true")).toBe(false);
+	});
+
+	test("takes only plain decimals as numbers, so an exponent is different text", () => {
+		expect(sameSettingValue("1e3", "1000")).toBe(false);
+		expect(sameSettingValue(" My Tribe ", "My Tribe")).toBe(true);
+		expect(sameSettingValue(undefined, "")).toBe(true);
+		expect(sameSettingValue(undefined, "1")).toBe(false);
 	});
 });
 

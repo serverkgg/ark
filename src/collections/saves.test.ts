@@ -1,14 +1,21 @@
 import { describe, expect, test } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
-import { SAVED_ARKS_DIRECTORY, savedArkDirectory } from "../shared";
-import { saves } from "./saves";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
+import { OFFICIAL_MAPS, SAVED_ARKS_DIRECTORY, savedArkDirectory } from "../shared";
+import { saves, worldWipedText } from "./saves";
 
 const harness = (options: { running: boolean; maps?: string[]; variables?: Record<string, string> }) => {
 	const maps = options.maps ?? [];
 	const removed: string[] = [];
 	const commands: string[][] = [];
+	const reported: Bridge.Activity[] = [];
 
 	const context = {
+		activity: {
+			report(entry: Bridge.Activity) {
+				reported.push(entry);
+			},
+		},
 		async exec(command: string[]) {
 			commands.push(command);
 
@@ -50,6 +57,7 @@ const harness = (options: { running: boolean; maps?: string[]; variables?: Recor
 		commands,
 		context,
 		removed,
+		reported,
 	};
 };
 
@@ -173,5 +181,68 @@ describe("wiping one map's world", () => {
 		).rejects.toThrow();
 
 		expect(removed).toEqual([]);
+	});
+});
+
+describe("the activity a wipe reports", () => {
+	test("names the wiped map's world", async () => {
+		const { context, reported } = harness({
+			maps: [
+				"ScorchedEarth_WP",
+			],
+			running: false,
+		});
+
+		await saves.actions?.wipe?.(
+			context,
+			{
+				id: "ScorchedEarth_WP",
+			},
+			{},
+		);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					map: "ScorchedEarth_WP",
+					world: "Scorched Earth",
+				},
+				name: BridgeEventName.WorldWiped,
+				subject: "Scorched Earth",
+			},
+		]);
+	});
+
+	test("reports nothing when the wipe is refused", async () => {
+		const { context, reported } = harness({
+			maps: [
+				"ScorchedEarth_WP",
+			],
+			running: true,
+		});
+
+		await expect(
+			saves.actions?.wipe?.(
+				context,
+				{
+					id: "ScorchedEarth_WP",
+				},
+				{},
+			),
+		).rejects.toThrow();
+
+		expect(reported).toEqual([]);
+	});
+});
+
+describe("worldWipedText", () => {
+	test("never puts an article in front of a map name, for every official map", () => {
+		for (const map of OFFICIAL_MAPS) {
+			const text = worldWipedText(map.name);
+
+			expect(text.en).not.toMatch(/\bthe\s+the\b/i);
+			expect(text.en).not.toMatch(/\b(the|a|an)\s+(?=[A-Z])/);
+			expect(text.ar).not.toContain(`ال${map.name.ar}`);
+		}
 	});
 });

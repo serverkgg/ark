@@ -4,9 +4,13 @@ import {
 	type ArkMod,
 	addMod,
 	CURSEFORGE_GAME_ID,
+	findMod,
 	MODS_DIRECTORY,
 	readMods,
 	removeMod,
+	reportModRemoved,
+	reportModStaged,
+	reportModToggled,
 	requireProjectId,
 	toggleMod,
 } from "../shared";
@@ -75,6 +79,7 @@ export const modDetails = async (context: Bridge.Context, projectId: string): Pr
 export const stageMod = async (context: Bridge.Context, id: string): Promise<Bridge.CatalogEntry> => {
 	const projectId = requireProjectId(id);
 	const details = await modDetails(context, projectId);
+	const staged = await findMod(context, projectId);
 	const sidecar = await addMod(context, {
 		addedAt: new Date().toISOString(),
 		enabled: true,
@@ -88,6 +93,13 @@ export const stageMod = async (context: Bridge.Context, id: string): Promise<Bri
 	context.log("staged a mod, the server downloads it itself on the next start", {
 		mod: projectId,
 	});
+
+	if (staged === null) {
+		reportModStaged(context, {
+			projectId,
+			title: details.title,
+		});
+	}
 
 	return entryOf(
 		mod ?? {
@@ -154,9 +166,23 @@ export const mods: Bridge.Catalog = {
 		return await stageMod(context, id);
 	},
 	async remove(context, id) {
-		await removeMod(context, requireProjectId(id));
+		const projectId = requireProjectId(id);
+		const mod = await findMod(context, projectId);
+
+		await removeMod(context, projectId);
+
+		if (mod !== null) {
+			reportModRemoved(context, mod);
+		}
 	},
 	async toggle(context, id, enabled) {
-		await toggleMod(context, requireProjectId(id), enabled);
+		const projectId = requireProjectId(id);
+		const mod = await findMod(context, projectId);
+
+		await toggleMod(context, projectId, enabled);
+
+		if (mod !== null && mod.enabled !== enabled) {
+			reportModToggled(context, mod, enabled);
+		}
 	},
 };

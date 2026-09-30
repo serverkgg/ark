@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
-import { MODS_SIDECAR_FILE, readMods } from "../shared";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
+import { MOD_ORDER_TARGET, MODS_SIDECAR_FILE, readMods } from "../shared";
 import { modOrder } from "./modOrder";
 
 const harness = (
@@ -29,7 +30,14 @@ const harness = (
 		);
 	}
 
+	const reported: Bridge.Activity[] = [];
+
 	const context = {
+		activity: {
+			report(entry: Bridge.Activity) {
+				reported.push(entry);
+			},
+		},
 		files: {
 			async exists(path: string) {
 				return files.has(path);
@@ -52,6 +60,7 @@ const harness = (
 		async ids() {
 			return (await readMods(context)).mods.map((mod) => mod.projectId);
 		},
+		reported,
 	};
 };
 
@@ -209,5 +218,107 @@ describe("reordering", () => {
 		);
 
 		expect(await ids()).toEqual([]);
+	});
+});
+
+describe("the activity the load order table reports", () => {
+	test("reports a staged id as enabled and waiting for the next start, never as installed", async () => {
+		const { context, reported } = harness();
+
+		await modOrder.add?.(context, "928437");
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					projectId: "928437",
+					staged: true,
+				},
+				name: BridgeEventName.ModEnabled,
+				subject: "928437",
+			},
+		]);
+		expect(reported.at(0)?.text.en).toContain("next start");
+	});
+
+	test("reports nothing when the id is already on the list", async () => {
+		const { context, reported } = harness([
+			{
+				projectId: "928437",
+			},
+		]);
+
+		await modOrder.add?.(context, "928437");
+
+		expect(reported).toEqual([]);
+	});
+
+	test("reports a move as a load order change with the new position", async () => {
+		const { context, reported } = harness([
+			{
+				projectId: "111111",
+			},
+			{
+				projectId: "222222",
+			},
+		]);
+
+		await modOrder.actions?.up?.(
+			context,
+			{
+				id: "222222",
+			},
+			{},
+		);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					position: 1,
+					projectId: "222222",
+					target: MOD_ORDER_TARGET,
+				},
+				name: BridgeEventName.SettingsApplied,
+				subject: "222222",
+			},
+		]);
+	});
+
+	test("reports nothing for a move that cannot happen", async () => {
+		const { context, reported } = harness([
+			{
+				projectId: "111111",
+			},
+		]);
+
+		await modOrder.actions?.up?.(
+			context,
+			{
+				id: "111111",
+			},
+			{},
+		);
+
+		expect(reported).toEqual([]);
+	});
+
+	test("reports a toggle and a removal by their own names", async () => {
+		const { context, reported } = harness([
+			{
+				projectId: "111111",
+			},
+		]);
+		const row = {
+			id: "111111",
+		};
+
+		await modOrder.actions?.toggle?.(context, row, {});
+		await modOrder.actions?.toggle?.(context, row, {});
+		await modOrder.actions?.remove?.(context, row, {});
+
+		expect(reported.map((entry) => entry.name)).toEqual([
+			BridgeEventName.ModDisabled,
+			BridgeEventName.ModEnabled,
+			BridgeEventName.ModRemoved,
+		]);
 	});
 });

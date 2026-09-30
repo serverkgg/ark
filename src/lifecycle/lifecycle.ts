@@ -3,6 +3,7 @@ import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { protonCommand } from "@serverkgg/bridge/wine";
 import {
 	applyControlConfig,
+	applyLaunchVariables,
 	DO_EXIT,
 	enabledModIds,
 	GAME_PORT,
@@ -98,11 +99,13 @@ export const lifecycle: Bridge.Lifecycle = {
 		roster.clear();
 
 		const promoted = await promoteAdminPassword(context, await readArkStamp(context));
+		const replayed = await replayPendingSettings(context, promoted);
 
-		await replayPendingSettings(context, promoted);
 		await applyControlConfig(context, promoted.adminPassword);
 
 		const variables = readLaunchVariables(context);
+
+		await applyLaunchVariables(context, replayed, variables);
 
 		const proton = await protonCommand(context, {
 			appId: STEAM_APP_ID,

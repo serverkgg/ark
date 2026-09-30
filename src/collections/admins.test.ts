@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { ADMIN_LIST_FILE } from "../shared";
 import { admins } from "./admins";
 
@@ -14,7 +15,14 @@ const harness = (listed?: string[]) => {
 		files.set(ADMIN_LIST_FILE, `${listed.join("\n")}\n`);
 	}
 
+	const reported: Bridge.Activity[] = [];
+
 	const context = {
+		activity: {
+			report(entry: Bridge.Activity) {
+				reported.push(entry);
+			},
+		},
 		files: {
 			async exists(path: string) {
 				return files.has(path);
@@ -40,6 +48,7 @@ const harness = (listed?: string[]) => {
 		file() {
 			return files.get(ADMIN_LIST_FILE) ?? "";
 		},
+		reported,
 	};
 };
 
@@ -108,5 +117,50 @@ describe("the admin list", () => {
 		const { context } = harness();
 
 		await expect(admins.add?.(context, "our friend")).rejects.toThrow();
+	});
+});
+
+describe("the activity the admins list reports", () => {
+	test("grants access to the account it added", async () => {
+		const { context, reported } = harness();
+
+		await admins.add?.(context, FIRST);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					eosId: FIRST,
+					list: "admins",
+				},
+				name: BridgeEventName.AccessGranted,
+				subject: FIRST,
+			},
+		]);
+	});
+
+	test("revokes access from the account it removed", async () => {
+		const { context, reported } = harness([
+			FIRST,
+		]);
+
+		await admins.actions?.remove?.(
+			context,
+			{
+				eosId: FIRST,
+				id: FIRST,
+			},
+			{},
+		);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					eosId: FIRST,
+					list: "admins",
+				},
+				name: BridgeEventName.AccessRevoked,
+				subject: FIRST,
+			},
+		]);
 	});
 });

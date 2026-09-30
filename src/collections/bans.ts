@@ -48,6 +48,17 @@ export const bans: Bridge.Collection = {
 			eosId,
 			player: eosId,
 		});
+		context.activity.report({
+			details: {
+				eosId,
+			},
+			name: BridgeEventName.PlayerBanned,
+			subject: eosId,
+			text: {
+				ar: `تم حظر الحساب ${eosId}`,
+				en: `Banned account ${eosId}`,
+			},
+		});
 
 		context.log("banned an account from the panel", {
 			eosId,
@@ -62,6 +73,18 @@ export const bans: Bridge.Collection = {
 			} else {
 				await editIdListFile(context, BAN_LIST_FILE, (ids) => withoutId(ids, eosId));
 			}
+
+			context.activity.report({
+				details: {
+					eosId,
+				},
+				name: BridgeEventName.PlayerUnbanned,
+				subject: eosId,
+				text: {
+					ar: `تم فك الحظر عن الحساب ${eosId}`,
+					en: `Unbanned account ${eosId}`,
+				},
+			});
 
 			context.log("lifted a ban from the panel", {
 				eosId,

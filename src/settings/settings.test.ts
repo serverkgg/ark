@@ -1,11 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import {
 	GAME_FILE,
 	GAME_USER_SETTINGS_FILE,
 	pendingFor,
 	readArkStamp,
+	replayPendingSettings,
 	SERVER_SETTINGS_SECTION,
 	SESSION_SETTINGS_SECTION,
 	SHOOTER_GAME_MODE_SECTION,
@@ -16,6 +18,7 @@ type IniStore = Map<string, Record<string, Bridge.Values>>;
 
 interface Harness {
 	context: Bridge.Context;
+	reported: Bridge.Activity[];
 	server: {
 		running: boolean;
 	};
@@ -35,8 +38,14 @@ const harness = (options: { running: boolean; ini?: Record<string, Record<string
 	const server = {
 		running: options.running,
 	};
+	const reported: Bridge.Activity[] = [];
 
 	const context = {
+		activity: {
+			report(entry: Bridge.Activity) {
+				reported.push(entry);
+			},
+		},
 		codec: {
 			ini: {
 				async merge(
@@ -90,6 +99,7 @@ const harness = (options: { running: boolean; ini?: Record<string, Record<string
 
 	return {
 		context,
+		reported,
 		section(file: string, section: string) {
 			return store.get(file)?.[section] ?? {};
 		},
@@ -426,5 +436,197 @@ describe("the file the game actually writes", () => {
 		const { context } = textHarness(PREAMBLE_INI);
 
 		expect(await settings.read(context)).not.toHaveProperty(";METADATA");
+	});
+});
+
+describe("the settings a start applies", () => {
+	const restart = async (context: Bridge.Context) => {
+		await replayPendingSettings(context, await readArkStamp(context));
+	};
+
+	test("reports the two values that changed and neither of the defaults saved unchanged", async () => {
+		const { context, reported } = harness({
+			ini: {
+				[GAME_USER_SETTINGS_FILE]: {
+					[SERVER_SETTINGS_SECTION]: {
+						XPMultiplier: "1.000000",
+					},
+					[SESSION_SETTINGS_SECTION]: {
+						SessionName: "Old Tribe",
+					},
+				},
+			},
+			running: true,
+		});
+		const shown = await settings.read(context);
+
+		await settings.write?.(context, {
+			Duration: shown.Duration ?? null,
+			ServerPVE: shown.ServerPVE ?? null,
+			SessionName: "New Tribe",
+			XPMultiplier: 2,
+		});
+		await restart(context);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					count: 2,
+					keys: "SessionName, XPMultiplier",
+				},
+				name: BridgeEventName.SettingsApplied,
+			},
+		]);
+	});
+
+	test("reports nothing for a value changed and changed back before the start", async () => {
+		const { context, reported } = harness({
+			running: true,
+		});
+		const shown = await settings.read(context);
+
+		await settings.write?.(context, {
+			XPMultiplier: 2,
+		});
+		await settings.write?.(context, {
+			XPMultiplier: shown.XPMultiplier ?? null,
+		});
+		await restart(context);
+
+		expect(reported).toEqual([]);
+	});
+
+	test("compares two saves before one start with the value the game started with", async () => {
+		const { context, reported } = harness({
+			running: true,
+		});
+		const shown = await settings.read(context);
+
+		await settings.write?.(context, {
+			XPMultiplier: 2,
+		});
+		await settings.write?.(context, {
+			XPMultiplier: 3,
+		});
+
+		expect((await readArkStamp(context)).settingsBaseline.XPMultiplier).toEqual({
+			value: String(shown.XPMultiplier),
+		});
+
+		await restart(context);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					count: 1,
+					keys: "XPMultiplier",
+				},
+			},
+		]);
+		expect((await readArkStamp(context)).settingsBaseline).toEqual({});
+	});
+
+	test("keeps only a flag for a join password, never its value or a digest", async () => {
+		const { context, reported } = harness({
+			ini: {
+				[GAME_USER_SETTINGS_FILE]: {
+					[SERVER_SETTINGS_SECTION]: {
+						ServerPassword: "old-join-password",
+					},
+				},
+			},
+			running: true,
+		});
+
+		await settings.write?.(context, {
+			ServerPassword: "new-join-password",
+		});
+
+		const baseline = (await readArkStamp(context)).settingsBaseline;
+
+		expect(baseline).toEqual({
+			ServerPassword: {
+				changed: true,
+			},
+		});
+		expect(JSON.stringify(baseline)).not.toContain("digest");
+
+		await restart(context);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					keys: "ServerPassword",
+				},
+			},
+		]);
+		expect(JSON.stringify(reported)).not.toContain("old-join-password");
+		expect(JSON.stringify(reported)).not.toContain("new-join-password");
+	});
+
+	test("still reports a join password changed and changed back, the accepted limit of keeping no value", async () => {
+		const { context, reported } = harness({
+			ini: {
+				[GAME_USER_SETTINGS_FILE]: {
+					[SERVER_SETTINGS_SECTION]: {
+						ServerPassword: "old-join-password",
+					},
+				},
+			},
+			running: true,
+		});
+
+		await settings.write?.(context, {
+			ServerPassword: "new-join-password",
+		});
+		await settings.write?.(context, {
+			ServerPassword: "old-join-password",
+		});
+		await restart(context);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					keys: "ServerPassword",
+				},
+			},
+		]);
+	});
+
+	test("reports nothing for a join password saved unchanged", async () => {
+		const { context, reported } = harness({
+			ini: {
+				[GAME_USER_SETTINGS_FILE]: {
+					[SERVER_SETTINGS_SECTION]: {
+						ServerPassword: "old-join-password",
+					},
+				},
+			},
+			running: true,
+		});
+
+		await settings.write?.(context, {
+			ServerPassword: "old-join-password",
+		});
+
+		expect((await readArkStamp(context)).settingsBaseline).toEqual({
+			ServerPassword: {
+				changed: false,
+			},
+		});
+
+		await restart(context);
+
+		expect(reported).toEqual([]);
+	});
+
+	test("reports nothing when nothing was parked", async () => {
+		const { context, reported } = harness({
+			running: true,
+		});
+
+		await restart(context);
+
+		expect(reported).toEqual([]);
 	});
 });

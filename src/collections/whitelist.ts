@@ -1,4 +1,5 @@
 import { type Bridge, BridgeKind } from "@serverkgg/bridge";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { editIdListFile, readIdListFile, requireEosId, WHITELIST_FILE, withId, withoutId } from "../shared";
 
 const REFRESH_SECONDS = 60;
@@ -27,6 +28,18 @@ export const whitelist: Bridge.Collection = {
 		const eosId = requireEosId(input);
 
 		await editIdListFile(context, WHITELIST_FILE, (ids) => withId(ids, eosId));
+		context.activity.report({
+			details: {
+				eosId,
+				list: "whitelist",
+			},
+			name: BridgeEventName.AccessGranted,
+			subject: eosId,
+			text: {
+				ar: `تمت إضافة الحساب ${eosId} للقائمة البيضاء`,
+				en: `Added account ${eosId} to the whitelist`,
+			},
+		});
 
 		context.log("added an account to the whitelist", {
 			eosId,
@@ -37,6 +50,18 @@ export const whitelist: Bridge.Collection = {
 			const eosId = requireEosId(row.id);
 
 			await editIdListFile(context, WHITELIST_FILE, (ids) => withoutId(ids, eosId));
+			context.activity.report({
+				details: {
+					eosId,
+					list: "whitelist",
+				},
+				name: BridgeEventName.AccessRevoked,
+				subject: eosId,
+				text: {
+					ar: `تمت إزالة الحساب ${eosId} من القائمة البيضاء`,
+					en: `Removed account ${eosId} from the whitelist`,
+				},
+			});
 
 			context.log("removed an account from the whitelist", {
 				eosId,

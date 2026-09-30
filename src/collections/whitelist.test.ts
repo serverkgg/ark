@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
+import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { WHITELIST_FILE } from "../shared";
 import { whitelist } from "./whitelist";
 
@@ -14,7 +15,14 @@ const harness = (listed?: string[]) => {
 		files.set(WHITELIST_FILE, `${listed.join("\n")}\n`);
 	}
 
+	const reported: Bridge.Activity[] = [];
+
 	const context = {
+		activity: {
+			report(entry: Bridge.Activity) {
+				reported.push(entry);
+			},
+		},
 		files: {
 			async exists(path: string) {
 				return files.has(path);
@@ -40,6 +48,7 @@ const harness = (listed?: string[]) => {
 		file() {
 			return files.get(WHITELIST_FILE) ?? "";
 		},
+		reported,
 	};
 };
 
@@ -93,5 +102,50 @@ describe("the whitelist", () => {
 		const { context } = harness();
 
 		await expect(whitelist.add?.(context, "1234")).rejects.toThrow();
+	});
+});
+
+describe("the activity the whitelist list reports", () => {
+	test("grants access to the account it added", async () => {
+		const { context, reported } = harness();
+
+		await whitelist.add?.(context, FIRST);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					eosId: FIRST,
+					list: "whitelist",
+				},
+				name: BridgeEventName.AccessGranted,
+				subject: FIRST,
+			},
+		]);
+	});
+
+	test("revokes access from the account it removed", async () => {
+		const { context, reported } = harness([
+			FIRST,
+		]);
+
+		await whitelist.actions?.remove?.(
+			context,
+			{
+				eosId: FIRST,
+				id: FIRST,
+			},
+			{},
+		);
+
+		expect(reported).toMatchObject([
+			{
+				details: {
+					eosId: FIRST,
+					list: "whitelist",
+				},
+				name: BridgeEventName.AccessRevoked,
+				subject: FIRST,
+			},
+		]);
 	});
 });
