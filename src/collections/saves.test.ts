@@ -4,7 +4,7 @@ import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { OFFICIAL_MAPS, SAVED_ARKS_DIRECTORY, savedArkDirectory } from "../shared";
 import { saves, worldWipedText } from "./saves";
 
-const harness = (options: { running: boolean; maps?: string[]; variables?: Record<string, string> }) => {
+const harness = (options: { maps?: string[]; variables?: Record<string, string> }) => {
 	const maps = options.maps ?? [];
 	const removed: string[] = [];
 	const commands: string[][] = [];
@@ -45,9 +45,6 @@ const harness = (options: { running: boolean; maps?: string[]; variables?: Recor
 			error: () => undefined,
 			warn: () => undefined,
 		}),
-		server: {
-			running: options.running,
-		},
 		variable(key: string) {
 			return options.variables?.[key] ?? null;
 		},
@@ -68,7 +65,6 @@ describe("listing the saved worlds", () => {
 				"Ragnarok_WP",
 				"TheIsland_WP",
 			],
-			running: false,
 			variables: {
 				MAP: "TheIsland_WP",
 			},
@@ -101,7 +97,6 @@ describe("listing the saved worlds", () => {
 			maps: [
 				"TheIsland_WP",
 			],
-			running: false,
 		});
 
 		await saves.list(context);
@@ -111,42 +106,18 @@ describe("listing the saved worlds", () => {
 	});
 
 	test("answers with nothing at all before the first save", async () => {
-		const { context } = harness({
-			running: false,
-		});
+		const { context } = harness({});
 
 		expect(await saves.list(context)).toEqual([]);
 	});
 });
 
 describe("wiping one map's world", () => {
-	test("refuses while the server is up, because the game would write it back out of memory", async () => {
-		const { context, removed } = harness({
-			maps: [
-				"TheIsland_WP",
-			],
-			running: true,
-		});
-
-		await expect(
-			saves.actions?.wipe?.(
-				context,
-				{
-					id: "TheIsland_WP",
-				},
-				{},
-			),
-		).rejects.toThrow();
-
-		expect(removed).toEqual([]);
-	});
-
 	test("removes exactly that map's folder", async () => {
 		const { context, removed } = harness({
 			maps: [
 				"TheIsland_WP",
 			],
-			running: false,
 		});
 
 		await saves.actions?.wipe?.(
@@ -167,7 +138,6 @@ describe("wiping one map's world", () => {
 			maps: [
 				"TheIsland_WP",
 			],
-			running: false,
 		});
 
 		await expect(
@@ -190,7 +160,6 @@ describe("the activity a wipe reports", () => {
 			maps: [
 				"ScorchedEarth_WP",
 			],
-			running: false,
 		});
 
 		await saves.actions?.wipe?.(
@@ -218,14 +187,13 @@ describe("the activity a wipe reports", () => {
 			maps: [
 				"ScorchedEarth_WP",
 			],
-			running: true,
 		});
 
 		await expect(
 			saves.actions?.wipe?.(
 				context,
 				{
-					id: "ScorchedEarth_WP",
+					id: "../../ShooterGame",
 				},
 				{},
 			),

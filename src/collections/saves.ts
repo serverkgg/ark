@@ -13,11 +13,6 @@ const SIZE_TIMEOUT_MS = 120_000;
 
 const SAFE_NAME = /^[A-Za-z0-9_.-]+$/;
 
-const MUST_BE_STOPPED: Bridge.Text = {
-	ar: "وقّف سيرفرك أول. الوايب وهو شغّال يخلي اللعبة تكتب العالم من ذاكرتها مرة ثانية.",
-	en: "Stop your server first. Wiping while it is up lets the game write the world back out of memory.",
-};
-
 const MISSING_SAVE: Bridge.Text = {
 	ar: "عالم الماب هذي ما عاد موجود.",
 	en: "That map's world is not there any more.",
@@ -130,10 +125,6 @@ export const saves: Bridge.Collection = {
 	},
 	actions: {
 		async wipe(context, row) {
-			if (context.server.running) {
-				throw new BridgeUserError(MUST_BE_STOPPED);
-			}
-
 			if (!SAFE_NAME.test(row.id)) {
 				throw new BridgeUserError(MISSING_SAVE);
 			}
