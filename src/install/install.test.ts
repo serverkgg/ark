@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { type Bridge, BridgeUserError } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
@@ -68,7 +68,7 @@ const harness = (options: { buildId?: string; roots?: string[]; failWrites?: boo
 };
 
 describe("recording the build steam installed", () => {
-	test("emits the plain update event and reports it beside, both with the from and to keys every other game uses", async () => {
+	it("emits the plain update event and reports it beside, both with the from and to keys every other game uses", async () => {
 		const { context, emitted, reported } = harness({
 			buildId: "100",
 		});
@@ -100,7 +100,7 @@ describe("recording the build steam installed", () => {
 		expect((await readArkStamp(context)).buildId).toBe("200");
 	});
 
-	test("reports nothing on the first build or on the same build", async () => {
+	it("reports nothing on the first build or on the same build", async () => {
 		const first = harness();
 
 		await recordBuild(first.context, await readArkStamp(first.context), "100");
@@ -119,7 +119,7 @@ describe("recording the build steam installed", () => {
 		expect(same.emitted).toEqual([]);
 	});
 
-	test("keeps the plain event but reports nothing when the build cannot be stamped", async () => {
+	it("keeps the plain event but reports nothing when the build cannot be stamped", async () => {
 		const { context, emitted, reported } = harness({
 			buildId: "100",
 			failWrites: true,
@@ -133,7 +133,7 @@ describe("recording the build steam installed", () => {
 		expect(reported).toEqual([]);
 	});
 
-	test("keeps the stamped build when steam names none", async () => {
+	it("keeps the stamped build when steam names none", async () => {
 		const { context, reported } = harness({
 			buildId: "100",
 		});
@@ -146,7 +146,7 @@ describe("recording the build steam installed", () => {
 });
 
 describe("the end of an install", () => {
-	test("reports a first install by the game's name", () => {
+	it("reports a first install by the game's name", () => {
 		const { context, reported } = harness();
 
 		reportGameInstalled(context, "100");
@@ -162,7 +162,7 @@ describe("the end of an install", () => {
 		]);
 	});
 
-	test("tells the owner to retry when the download left the game files missing, and keeps the detail as the cause", async () => {
+	it("tells the owner to retry when the download left the game files missing, and keeps the detail as the cause", async () => {
 		const { context } = harness({
 			roots: [],
 		});
@@ -176,7 +176,7 @@ describe("the end of an install", () => {
 		expect(failure instanceof Error ? String(failure.cause) : "").toContain("steamcmd finished but");
 	});
 
-	test("passes when every game root is there", async () => {
+	it("passes when every game root is there", async () => {
 		const { context } = harness();
 
 		await requireGameFiles(context);

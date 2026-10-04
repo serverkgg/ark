@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { WHITELIST_FILE } from "../shared";
@@ -53,7 +53,7 @@ const harness = (listed?: string[]) => {
 };
 
 describe("the whitelist", () => {
-	test("reads the accounts out of the exclusive join file", async () => {
+	it("reads the accounts out of the exclusive join file", async () => {
 		const { context } = harness([
 			FIRST,
 		]);
@@ -66,13 +66,13 @@ describe("the whitelist", () => {
 		]);
 	});
 
-	test("answers with nothing at all before the file exists", async () => {
+	it("answers with nothing at all before the file exists", async () => {
 		const { context } = harness();
 
 		expect(await whitelist.list(context)).toEqual([]);
 	});
 
-	test("adds an account to the file the launch flag reads", async () => {
+	it("adds an account to the file the launch flag reads", async () => {
 		const { context, file } = harness();
 
 		await whitelist.add?.(context, FIRST);
@@ -80,7 +80,7 @@ describe("the whitelist", () => {
 		expect(file()).toBe(`${FIRST}\n`);
 	});
 
-	test("drops one account and leaves the rest", async () => {
+	it("drops one account and leaves the rest", async () => {
 		const { context, file } = harness([
 			FIRST,
 			SECOND,
@@ -98,7 +98,7 @@ describe("the whitelist", () => {
 		expect(file()).toBe(`${FIRST}\n`);
 	});
 
-	test("refuses anything that is not an account id", async () => {
+	it("refuses anything that is not an account id", async () => {
 		const { context } = harness();
 
 		await expect(whitelist.add?.(context, "1234")).rejects.toThrow();
@@ -106,7 +106,7 @@ describe("the whitelist", () => {
 });
 
 describe("the activity the whitelist list reports", () => {
-	test("grants access to the account it added", async () => {
+	it("grants access to the account it added", async () => {
 		const { context, reported } = harness();
 
 		await whitelist.add?.(context, FIRST);
@@ -123,7 +123,7 @@ describe("the activity the whitelist list reports", () => {
 		]);
 	});
 
-	test("revokes access from the account it removed", async () => {
+	it("revokes access from the account it removed", async () => {
 		const { context, reported } = harness([
 			FIRST,
 		]);

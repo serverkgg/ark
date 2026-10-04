@@ -50,8 +50,8 @@ export const rosterLines = (rows: ArkPlayerRow[]): string[] => {
 const needleOf = (line: ArkConsoleLine) => {
 	if (line.rest.length === 0) {
 		throw new BridgeUserError({
-			ar: "اكتب اسم اللاعب أو رقم حسابه أول.",
-			en: "Write the player name or their account id first.",
+			ar: "اكتب اسم اللاعب أو معرّفه أولًا.",
+			en: "Write the player name or their account ID first.",
 		});
 	}
 
@@ -68,8 +68,8 @@ const targetOf = async (context: Bridge.Context, line: ArkConsoleLine): Promise<
 
 	if (!EOS_ID_PATTERN.test(needle)) {
 		throw new BridgeUserError({
-			ar: "ما فيه لاعب بهذا الاسم داخل الحين. لو تبي واحد مو داخل، اكتب رقم حسابه.",
-			en: "No player with that name is online right now. For someone who is offline, write their account id.",
+			ar: "لا يوجد لاعب متصل بهذا الاسم الآن. للاعب غير متصل، اكتب معرّفه.",
+			en: "No player with that name is online right now. For someone who's offline, write their account ID.",
 		});
 	}
 
@@ -95,7 +95,7 @@ export const consoleCommands: Record<string, ArkConsoleCommand> = {
 
 	async doexit() {
 		throw new BridgeUserError({
-			ar: "DoExit يقفل سيرفرك بدون ما نحفظ ولا نرتب بعده. استخدم زر الإيقاف من فوق.",
+			ar: "يغلق DoExit سيرفرك دون حفظ ودون أي ترتيب بعده. استخدم زر الإيقاف في الأعلى بدلًا منه.",
 			en: "DoExit drops your server with nothing saved and nothing cleaned up. Use the Stop button above instead.",
 		});
 	},
@@ -115,8 +115,6 @@ export const consoleCommands: Record<string, ArkConsoleCommand> = {
 	},
 };
 
-// ARK's own console is RCON, and it carries hundreds of admin commands no catalog can
-// list, so anything without a handler here goes out on the wire as the player typed it.
 export const consoleHandler: NonNullable<Bridge.Terminal["run"]> = async (context, input) => {
 	const line = parseConsoleLine(input);
 

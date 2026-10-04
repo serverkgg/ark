@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
@@ -91,7 +91,7 @@ beforeEach(() => {
 });
 
 describe("acting on a player from the roster", () => {
-	test("keeps the kick event unchanged and reports the kick by the player's name", async () => {
+	it("keeps the kick event unchanged and reports the kick by the player's name", async () => {
 		const { context, emitted, reported } = harness();
 
 		await kickPlayer(context, row);
@@ -117,7 +117,7 @@ describe("acting on a player from the roster", () => {
 		expect(JSON.stringify(reported)).not.toContain(PASSWORD);
 	});
 
-	test("keeps the ban event unchanged and reports the ban by the player's name", async () => {
+	it("keeps the ban event unchanged and reports the ban by the player's name", async () => {
 		const { context, emitted, reported, sent } = harness();
 
 		await banPlayer(context, row);
@@ -137,7 +137,7 @@ describe("acting on a player from the roster", () => {
 		expect(JSON.stringify(reported)).not.toContain(PASSWORD);
 	});
 
-	test("falls back to the account id when the roster has no name", async () => {
+	it("falls back to the account id when the roster has no name", async () => {
 		const { context, reported } = harness();
 
 		await kickPlayer(context, {

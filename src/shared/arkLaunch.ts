@@ -36,7 +36,7 @@ const sameSnapshot = (previous: Record<string, string>, next: Record<string, str
 
 export const worldActivatedText = (from: Bridge.Text, to: Bridge.Text): Bridge.Text => {
 	return {
-		ar: `تم تغيير الماب من ${from.ar} إلى ${to.ar}، وكل ماب له حفظه، فحفظ ${from.ar} باقي لو رجعت له`,
+		ar: `تم تغيير الماب من ${from.ar} إلى ${to.ar}، ولكل ماب حفظها، فيبقى حفظ ${from.ar} إذا رجعت إليها`,
 		en: `Changed the map from ${from.en} to ${to.en}, each map keeps its own save, so the save on ${from.en} is still there if you switch back`,
 	};
 };
@@ -67,7 +67,7 @@ const reportLaunchApplied = (context: Bridge.Context, keys: string[]) => {
 		},
 		name: BridgeEventName.SettingsApplied,
 		text: {
-			ar: `تم تطبيق خيارات التشغيل اللي تغيّرت (${keys.length})`,
+			ar: `تم تطبيق خيارات التشغيل التي تغيّرت (${keys.length})`,
 			en: `Applied the changed launch options (${keys.length})`,
 		},
 	});

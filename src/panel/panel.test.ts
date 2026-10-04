@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import {
 	type Bridge,
 	BridgeConfirm,
@@ -34,7 +34,7 @@ const actionOf = (id: string, action: string) => {
 };
 
 describe("the tabs", () => {
-	test("open on the settings and end on the controls", () => {
+	it("open on the settings and end on the controls", () => {
 		expect(panel.tabs.map((tab) => tab.id)).toEqual([
 			"settings",
 			"launch",
@@ -44,8 +44,7 @@ describe("the tabs", () => {
 		]);
 	});
 
-	test("gives every section a title and every form a line saying what it is for", () => {
-		// The remote access sections come from the shared rcon helper and carry their own copy.
+	it("gives every section a title and every form a line saying what it is for", () => {
 		for (const section of sections.filter((entry) => !entry.id.startsWith("rcon-access"))) {
 			expect(section.title).toBeDefined();
 
@@ -61,7 +60,7 @@ describe("the settings forms", () => {
 		(section) => section.layout === BridgeLayout.Form,
 	);
 
-	test("all write through the one settings module", () => {
+	it("all write through the one settings module", () => {
 		expect(forms).toHaveLength(5);
 
 		for (const form of forms) {
@@ -71,11 +70,11 @@ describe("the settings forms", () => {
 		}
 	});
 
-	test("masks the join password rather than showing it back", () => {
+	it("masks the join password rather than showing it back", () => {
 		expect(fieldOf("server", "ServerPassword")?.control).toBe(BridgeControl.Secret);
 	});
 
-	test("carries the server name with the pattern the launch line needs", () => {
+	it("carries the server name with the pattern the launch line needs", () => {
 		const sessionName = fieldOf("server", "SessionName");
 
 		expect(sessionName?.control).toBe(BridgeControl.Text);
@@ -85,11 +84,11 @@ describe("the settings forms", () => {
 });
 
 describe("the launch form", () => {
-	test("offers exactly the maps the driver knows how to start", () => {
+	it("offers exactly the maps the driver knows how to start", () => {
 		expect(fieldOf("launch", MAP_VARIABLE)?.options).toEqual(mapOptions());
 	});
 
-	test("asks for a mod map only after the customer picks one", () => {
+	it("asks for a mod map only after the customer picks one", () => {
 		const custom = fieldOf("launch", CUSTOM_MAP_VARIABLE);
 
 		expect(custom?.pattern).toBe(MAP_ID_PATTERN);
@@ -103,7 +102,7 @@ describe("the launch form", () => {
 });
 
 describe("the mods tab", () => {
-	test("pairs the catalog with the load order table", () => {
+	it("pairs the catalog with the load order table", () => {
 		expect(sectionOf("catalog")?.layout).toBe(BridgeLayout.Catalog);
 		expect(sectionOf("catalog")?.module).toBe("mods");
 
@@ -114,7 +113,7 @@ describe("the mods tab", () => {
 		expect(order?.layout === BridgeLayout.Table ? order.add : null).toBeDefined();
 	});
 
-	test("carries the four controls a load order needs", () => {
+	it("carries the four controls a load order needs", () => {
 		const order = sectionOf("order");
 		const actions = order && "actions" in order ? (order.actions ?? []) : [];
 
@@ -126,7 +125,7 @@ describe("the mods tab", () => {
 		]);
 	});
 
-	test("says a mod change lands on the next start", () => {
+	it("says a mod change lands on the next start", () => {
 		const catalog = sectionOf("catalog");
 
 		expect(catalog?.layout === BridgeLayout.Catalog ? catalog.restartHint : null).toBe(true);
@@ -134,7 +133,7 @@ describe("the mods tab", () => {
 });
 
 describe("the players page", () => {
-	test("puts the roster and the three lists where the platform renders players", () => {
+	it("puts the roster and the three lists where the platform renders players", () => {
 		for (const id of [
 			"online",
 			"bans",
@@ -147,11 +146,11 @@ describe("the players page", () => {
 		}
 	});
 
-	test("lets a ban reach someone who is not connected", () => {
+	it("lets a ban reach someone who is not connected", () => {
 		expect(actionOf("online", "ban")?.offline).toBe(true);
 	});
 
-	test("takes an account id into every list", () => {
+	it("takes an account id into every list", () => {
 		for (const id of [
 			"bans",
 			"admins",
@@ -165,13 +164,13 @@ describe("the players page", () => {
 });
 
 describe("the destructive controls", () => {
-	test("asks twice before anything that cannot be taken back", () => {
+	it("asks twice before anything that cannot be taken back", () => {
 		expect(actionOf("live", "destroyWildDinos")?.confirm).toBe(BridgeConfirm.Strong);
 		expect(actionOf("saves", "wipe")?.confirm).toBe(BridgeConfirm.Strong);
 		expect(actionOf("admin", "rotateAdmin")?.confirm).toBe(BridgeConfirm.Strong);
 	});
 
-	test("says in Arabic and English what each one costs", () => {
+	it("says in Arabic and English what each one costs", () => {
 		for (const action of [
 			actionOf("live", "destroyWildDinos"),
 			actionOf("saves", "wipe"),

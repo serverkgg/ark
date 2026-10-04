@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { type Bridge, BridgeRconCode, BridgeRconError } from "@serverkgg/bridge";
 import { SAVE_LINE } from "../lifecycle";
 import { SAVE_WORLD } from "../shared";
@@ -67,7 +67,7 @@ const harness = (options: Harness) => {
 };
 
 describe("holding the world still before the backup", () => {
-	test("asks ark to save the world and waits for the line it prints when it is done", async () => {
+	it("asks ark to save the world and waits for the line it prints when it is done", async () => {
 		const run = harness({
 			password: "saves-cleanly",
 		});
@@ -82,7 +82,7 @@ describe("holding the world still before the backup", () => {
 		]);
 	});
 
-	test("raises when rcon will not take the save, so the point is not labelled clean", async () => {
+	it("raises when rcon will not take the save, so the point is not labelled clean", async () => {
 		const run = harness({
 			password: "no-rcon",
 			reachable: false,
@@ -92,7 +92,7 @@ describe("holding the world still before the backup", () => {
 		expect(run.notes).toEqual([]);
 	});
 
-	test("raises when the save never reports, so the point is not labelled clean", async () => {
+	it("raises when the save never reports, so the point is not labelled clean", async () => {
 		const run = harness({
 			answers: false,
 			password: "never-confirms",
@@ -104,7 +104,7 @@ describe("holding the world still before the backup", () => {
 		expect(run.notes).toEqual([]);
 	});
 
-	test("sends nothing to a server that is not running", async () => {
+	it("sends nothing to a server that is not running", async () => {
 		const run = harness({
 			password: "parked",
 			running: false,
@@ -115,7 +115,7 @@ describe("holding the world still before the backup", () => {
 		expect(run.sent).toEqual([]);
 	});
 
-	test("matches the line a real ark console prints when the save finishes", () => {
+	it("matches the line a real ark console prints when the save finishes", () => {
 		expect(SAVE_LINE.test(SAVE_REPLY)).toBe(true);
 	});
 });

@@ -15,7 +15,7 @@ const player: Bridge.TerminalArg = {
 const eosId: Bridge.TerminalArg = {
 	key: "eosId",
 	label: {
-		ar: "رقم الحساب",
+		ar: "معرّف اللاعب",
 		en: "Account id",
 	},
 	required: true,
@@ -35,8 +35,8 @@ const commands: Bridge.TerminalCommand[] = [
 	{
 		name: "ListPlayers",
 		summary: {
-			ar: "يعرض اللاعبين الداخلين الحين مع أرقام حساباتهم.",
-			en: "List the players who are online, with their account ids.",
+			ar: "يعرض اللاعبين المتصلين الآن مع أرقام حساباتهم.",
+			en: "List the players who are online, with their account IDs.",
 		},
 	},
 	{
@@ -45,7 +45,7 @@ const commands: Bridge.TerminalCommand[] = [
 		],
 		name: "KickPlayer",
 		summary: {
-			ar: "يطرد لاعب من سيرفرك.",
+			ar: "يطرد لاعبًا من سيرفرك.",
 			en: "Kick a player from your server.",
 		},
 		syntax: "KickPlayer <player>",
@@ -57,8 +57,8 @@ const commands: Bridge.TerminalCommand[] = [
 		danger: true,
 		name: "BanPlayer",
 		summary: {
-			ar: "يحظر لاعب نهائيًا. لو مو داخل الحين، اكتب رقم حسابه بدل اسمه.",
-			en: "Ban a player for good. If they are offline, write their account id instead of their name.",
+			ar: "يحظر لاعبًا نهائيًا. إذا لم يكن متصلًا الآن، فاكتب معرّفه بدلًا من اسمه.",
+			en: "Ban a player for good. If they're offline, write their account ID instead of their name.",
 		},
 		syntax: "BanPlayer <player>",
 	},
@@ -68,8 +68,8 @@ const commands: Bridge.TerminalCommand[] = [
 		],
 		name: "UnbanPlayer",
 		summary: {
-			ar: "يفك الحظر عن حساب برقمه.",
-			en: "Lift a ban with the account id.",
+			ar: "يفك الحظر عن لاعب بمعرّفه.",
+			en: "Unban an account by its ID.",
 		},
 		syntax: "UnbanPlayer <eosId>",
 	},
@@ -90,7 +90,7 @@ const commands: Bridge.TerminalCommand[] = [
 		],
 		name: "Broadcast",
 		summary: {
-			ar: "رسالة تطلع على شاشة كل اللاعبين.",
+			ar: "رسالة تظهر على شاشة كل اللاعبين.",
 			en: "A message that pops up on every player's screen.",
 		},
 		syntax: "Broadcast <message>",
@@ -102,23 +102,23 @@ const commands: Bridge.TerminalCommand[] = [
 		],
 		name: "ServerChatTo",
 		summary: {
-			ar: "رسالة للاعب واحد بس، برقم حسابه.",
-			en: "A message to one player, by their account id.",
+			ar: "رسالة إلى لاعب واحد فقط، بمعرّفه.",
+			en: "A message to one player, by their account ID.",
 		},
 		syntax: 'ServerChatTo "<eosId>" <message>',
 	},
 	{
 		name: "SaveWorld",
 		summary: {
-			ar: "يحفظ عالمك على القرص الحين.",
-			en: "Save your world to disk right now.",
+			ar: "يحفظ مابك على القرص الآن.",
+			en: "Save your map to disk right now.",
 		},
 	},
 	{
 		danger: true,
 		name: "DestroyWildDinos",
 		summary: {
-			ar: "يمسح كل الديناصورات البرية عشان ترجع تنزل من جديد. المروّضة ما تنمس.",
+			ar: "يحذف كل الديناصورات البرية لتظهر من جديد. لا تتأثر الديناصورات المروّضة.",
 			en: "Clears every wild dino so the map respawns them. Tamed dinos are untouched.",
 		},
 	},
@@ -139,7 +139,7 @@ const commands: Bridge.TerminalCommand[] = [
 	{
 		name: "ShowMessageOfTheDay",
 		summary: {
-			ar: "يعرض رسالة اليوم زي ما يشوفها اللاعب.",
+			ar: "يعرض رسالة اليوم كما يراها اللاعب.",
 			en: "Show the message of the day the way a player sees it.",
 		},
 	},
@@ -147,8 +147,8 @@ const commands: Bridge.TerminalCommand[] = [
 		danger: true,
 		name: "DoExit",
 		summary: {
-			ar: "يقفل سيرفرك بدون حفظ — استخدم زر الإيقاف بدلها.",
-			en: "Drops your server with nothing saved — use the Stop button instead.",
+			ar: "يغلق سيرفرك دون حفظ. استخدم زر الإيقاف بدلًا منه.",
+			en: "Drops your server with nothing saved. Use the Stop button instead.",
 		},
 	},
 ];
@@ -168,8 +168,6 @@ const rules: Bridge.TerminalRule[] = [
 	},
 ];
 
-// ARK reads nothing on stdin: the game's own console is rcon, so every line typed here
-// is answered by the driver instead of being written into a pipe nobody reads.
 export const terminal: Bridge.Terminal = {
 	kind: BridgeKind.Terminal,
 	commands,

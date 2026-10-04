@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { BridgeUserError } from "@serverkgg/bridge";
 import { MODS_SIDECAR_FILE } from "./arkApp";
@@ -50,12 +50,12 @@ const sidecarContext = (mods: ArkMod[] = []) => {
 };
 
 describe("isProjectId and requireProjectId", () => {
-	test("takes the digits a CurseForge url carries", () => {
+	it("takes the digits a CurseForge url carries", () => {
 		expect(isProjectId("893657")).toBe(true);
 		expect(isProjectId("  893657 ")).toBe(true);
 	});
 
-	test("refuses a slug or a url", () => {
+	it("refuses a slug or a url", () => {
 		expect(isProjectId("structures-plus")).toBe(false);
 		expect(isProjectId("")).toBe(false);
 		expect(() => requireProjectId("structures-plus")).toThrow(BridgeUserError);
@@ -63,13 +63,13 @@ describe("isProjectId and requireProjectId", () => {
 });
 
 describe("normalizeSidecar", () => {
-	test("reads a missing file as no mods", () => {
+	it("reads a missing file as no mods", () => {
 		expect(normalizeSidecar(null)).toEqual({
 			mods: [],
 		});
 	});
 
-	test("drops an entry with no usable id and keeps one entry per mod", () => {
+	it("drops an entry with no usable id and keeps one entry per mod", () => {
 		expect(
 			normalizeSidecar({
 				mods: [
@@ -83,7 +83,7 @@ describe("normalizeSidecar", () => {
 		).toHaveLength(1);
 	});
 
-	test("treats a mod with no enabled flag as enabled", () => {
+	it("treats a mod with no enabled flag as enabled", () => {
 		expect(
 			normalizeSidecar({
 				mods: [
@@ -97,7 +97,7 @@ describe("normalizeSidecar", () => {
 });
 
 describe("the ordered list the launch line is built from", () => {
-	test("keeps the order mods were added in", async () => {
+	it("keeps the order mods were added in", async () => {
 		const context = sidecarContext();
 
 		await addMod(context, mod("111111"));
@@ -109,7 +109,7 @@ describe("the ordered list the launch line is built from", () => {
 		]);
 	});
 
-	test("adds a mod once", async () => {
+	it("adds a mod once", async () => {
 		const context = sidecarContext();
 
 		await addMod(context, mod("111111"));
@@ -118,7 +118,7 @@ describe("the ordered list the launch line is built from", () => {
 		expect((await readMods(context)).mods).toHaveLength(1);
 	});
 
-	test("leaves a disabled mod in the list but off the launch line", async () => {
+	it("leaves a disabled mod in the list but off the launch line", async () => {
 		const context = sidecarContext([
 			mod("111111"),
 			mod("222222"),
@@ -132,7 +132,7 @@ describe("the ordered list the launch line is built from", () => {
 		]);
 	});
 
-	test("moves a mod up and down, and stops at the ends", async () => {
+	it("moves a mod up and down, and stops at the ends", async () => {
 		const context = sidecarContext([
 			mod("111111"),
 			mod("222222"),
@@ -153,7 +153,7 @@ describe("the ordered list the launch line is built from", () => {
 		]);
 	});
 
-	test("removes a mod", async () => {
+	it("removes a mod", async () => {
 		const context = sidecarContext([
 			mod("111111"),
 		]);
@@ -163,7 +163,7 @@ describe("the ordered list the launch line is built from", () => {
 		expect((await readMods(context)).mods).toEqual([]);
 	});
 
-	test("refuses to grow past the limit the launch line can carry", async () => {
+	it("refuses to grow past the limit the launch line can carry", async () => {
 		const context = sidecarContext(
 			Array.from(
 				{

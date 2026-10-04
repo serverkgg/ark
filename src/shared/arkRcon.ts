@@ -3,13 +3,13 @@ import { RCON_PORT, RCON_TIMEOUT_MS } from "./arkApp";
 import { readArkStamp } from "./arkStamp";
 
 export const RCON_UNREACHABLE: Bridge.Text = {
-	ar: "ما قدرنا نوصل لسيرفرك. تأكد إنه شغّال وجرّب مرة ثانية.",
-	en: "We could not reach your server. Make sure it is running and try again.",
+	ar: "تعذّر الوصول إلى سيرفرك. تأكد من أنه شغّال، وجرب مرة ثانية.",
+	en: "We couldn't reach your server. Make sure it's running and try again.",
 };
 
 export const RCON_UNSEEDED: Bridge.Text = {
-	ar: "قناة التحكم ما جهزت بعد. شغّل سيرفرك مرة وحدة وبتجهز.",
-	en: "The control channel is not ready yet. Start your server once and it will be there.",
+	ar: "قناة التحكم غير جاهزة بعد. شغّل سيرفرك مرة واحدة لتجهز.",
+	en: "The control channel isn't ready yet. Start your server once and it will be there.",
 };
 
 let client: BridgeRconClient | null = null;
@@ -25,8 +25,6 @@ const dropClient = () => {
 	void open?.disconnect().catch(() => undefined);
 };
 
-// mirroredIds stays on: ARK sends unsolicited keep-alive frames, and turning the id
-// filter off would let one of them answer the command that is in flight.
 const connect = async (context: Bridge.Context) => {
 	const stamp = await readArkStamp(context);
 

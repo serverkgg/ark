@@ -16,8 +16,6 @@ export const whitelistRow = (eosId: string): ArkWhitelistRow => {
 	};
 };
 
-// The list only bites while the exclusive join variable is on; without it ARK reads the
-// file and lets everyone in anyway.
 export const whitelist: Bridge.Collection = {
 	kind: BridgeKind.Collection,
 	refreshSeconds: REFRESH_SECONDS,
@@ -36,7 +34,7 @@ export const whitelist: Bridge.Collection = {
 			name: BridgeEventName.AccessGranted,
 			subject: eosId,
 			text: {
-				ar: `تمت إضافة الحساب ${eosId} للقائمة البيضاء`,
+				ar: `تمت إضافة الحساب ${eosId} إلى القائمة البيضاء`,
 				en: `Added account ${eosId} to the whitelist`,
 			},
 		});

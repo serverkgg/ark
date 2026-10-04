@@ -5,7 +5,7 @@ import { banCommand, EOS_ID_PATTERN, kickCommand, rconCommand, readRoster } from
 const REFRESH_SECONDS = 15;
 
 const UNKNOWN_PLAYER: Bridge.Text = {
-	ar: "اللاعب هذا ما عاد داخل السيرفر.",
+	ar: "هذا اللاعب لم يعد متصلًا بالسيرفر.",
 	en: "That player is no longer on the server.",
 };
 

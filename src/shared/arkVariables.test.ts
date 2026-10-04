@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { MAX_PLAYERS_DEFAULT } from "./arkApp";
 import { clampMaxPlayers, mapIdOf, readLaunchVariables } from "./arkVariables";
@@ -12,14 +12,14 @@ const variableContext = (variables: Record<string, string>) => {
 };
 
 describe("clampMaxPlayers", () => {
-	test("holds the range the game accepts", () => {
+	it("holds the range the game accepts", () => {
 		expect(clampMaxPlayers(0)).toBe(1);
 		expect(clampMaxPlayers(9999)).toBe(200);
 		expect(clampMaxPlayers("70")).toBe(70);
 		expect(clampMaxPlayers(30.4)).toBe(30);
 	});
 
-	test("falls back to the default for anything unreadable", () => {
+	it("falls back to the default for anything unreadable", () => {
 		expect(clampMaxPlayers(null)).toBe(MAX_PLAYERS_DEFAULT);
 		expect(clampMaxPlayers("")).toBe(MAX_PLAYERS_DEFAULT);
 		expect(clampMaxPlayers("many")).toBe(MAX_PLAYERS_DEFAULT);
@@ -27,18 +27,16 @@ describe("clampMaxPlayers", () => {
 });
 
 describe("mapIdOf", () => {
-	test("takes an official map as it stands", () => {
+	it("takes an official map as it stands", () => {
 		expect(mapIdOf("Ragnarok_WP", null)).toBe("Ragnarok_WP");
 	});
 
-	test("reads the custom map only while the select says custom", () => {
+	it("reads the custom map only while the select says custom", () => {
 		expect(mapIdOf("custom", "Svartalfheim_WP")).toBe("Svartalfheim_WP");
 		expect(mapIdOf("TheCenter_WP", "Svartalfheim_WP")).toBe("TheCenter_WP");
 	});
 
-	// A bad map name would otherwise leave the server refusing to boot with no reason a
-	// customer can read, so it starts on the default instead.
-	test("falls back to the default rather than launching on a name the engine rejects", () => {
+	it("falls back to the default rather than launching on a name the engine rejects", () => {
 		expect(mapIdOf("custom", "not a map")).toBe("TheIsland_WP");
 		expect(mapIdOf("custom", "")).toBe("TheIsland_WP");
 		expect(mapIdOf(null, null)).toBe("TheIsland_WP");
@@ -47,7 +45,7 @@ describe("mapIdOf", () => {
 });
 
 describe("readLaunchVariables", () => {
-	test("reads the defaults a fresh server carries", () => {
+	it("reads the defaults a fresh server carries", () => {
 		expect(readLaunchVariables(variableContext({}))).toEqual({
 			battleye: false,
 			crossplay: true,
@@ -57,7 +55,7 @@ describe("readLaunchVariables", () => {
 		});
 	});
 
-	test("reads every toggle off its variable", () => {
+	it("reads every toggle off its variable", () => {
 		expect(
 			readLaunchVariables(
 				variableContext({

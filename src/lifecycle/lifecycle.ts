@@ -25,18 +25,24 @@ import {
 } from "../shared";
 import { startArgs } from "./arkCommand";
 
-// The July 2026 engine build refuses to boot headless without an SDL driver it can
-// accept, and Proton reaches for a runtime directory it must be allowed to write to.
-// The wrapper adds xvfb-run on top; both are needed, neither replaces the other.
-// GE-Proton's launcher reads PROTON_USE_XALIA, and Xalia still crashes with "Video
-// driver not supported" under the dummy driver — harmless, but it lands in the
-// customer's console.
-export const ARK_ENVIRONMENT: Record<string, string> = {
-	PROTON_USE_XALIA: "0",
+const HEADLESS_SDL_DRIVERS_THE_ENGINE_REQUIRES = {
 	SDL_AUDIODRIVER: "dummy",
 	SDL_VIDEODRIVER: "dummy",
-	XDG_RUNTIME_DIR: "/tmp/serverk-xdg",
 	XDG_SESSION_TYPE: "headless",
+};
+
+const WRITABLE_PROTON_RUNTIME_DIRECTORY = {
+	XDG_RUNTIME_DIR: "/tmp/serverk-xdg",
+};
+
+const XALIA_OFF_TO_KEEP_ITS_CRASH_OUT_OF_THE_CONSOLE = {
+	PROTON_USE_XALIA: "0",
+};
+
+export const ARK_ENVIRONMENT: Record<string, string> = {
+	...XALIA_OFF_TO_KEEP_ITS_CRASH_OUT_OF_THE_CONSOLE,
+	...HEADLESS_SDL_DRIVERS_THE_ENGINE_REQUIRES,
+	...WRITABLE_PROTON_RUNTIME_DIRECTORY,
 };
 
 export const SERVER_READY = /has successfully started/;

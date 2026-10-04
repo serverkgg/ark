@@ -2,13 +2,15 @@ import { type Bridge, BridgeKind } from "@serverkgg/bridge";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { SAVE_LINE, SERVER_READY } from "../lifecycle";
 
-// ARK logs a join and a leave at a verbosity the shipped server never prints, so the
-// roster poll raises those two and they are declared in `emits` instead.
+const EVENTS_RAISED_BY_ROSTER_POLL = [
+	BridgeEventName.PlayerJoined,
+	BridgeEventName.PlayerLeft,
+];
+
 export const events: Bridge.Events = {
 	kind: BridgeKind.Events,
 	emits: [
-		BridgeEventName.PlayerJoined,
-		BridgeEventName.PlayerLeft,
+		...EVENTS_RAISED_BY_ROSTER_POLL,
 		BridgeEventName.PlayerKicked,
 		BridgeEventName.PlayerBanned,
 		BridgeEventName.ServerStopping,

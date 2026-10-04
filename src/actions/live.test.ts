@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import { BRIDGE_ACTIVITY_EXCERPT_LENGTH_LIMIT, BridgeEventName } from "@serverkgg/bridge/protocol";
@@ -72,7 +72,7 @@ beforeEach(() => {
 });
 
 describe("the live actions", () => {
-	test("reports a broadcast with an excerpt of the message, never the whole of a long one", async () => {
+	it("reports a broadcast with an excerpt of the message, never the whole of a long one", async () => {
 		const { context, reported } = harness();
 		const message = `Wipe tonight at nine. ${"Bring your dinos home. ".repeat(10)}`;
 
@@ -89,7 +89,7 @@ describe("the live actions", () => {
 		expect(JSON.stringify(reported)).not.toContain(PASSWORD);
 	});
 
-	test("reports clearing the wild dinos as a gameplay change", async () => {
+	it("reports clearing the wild dinos as a gameplay change", async () => {
 		const { context, reported } = harness();
 
 		await live.actions.destroyWildDinos?.(context, {});
@@ -105,7 +105,7 @@ describe("the live actions", () => {
 		expect(JSON.stringify(reported)).not.toContain(PASSWORD);
 	});
 
-	test("reports a manual save as a gameplay change", async () => {
+	it("reports a manual save as a gameplay change", async () => {
 		const { context, reported, sent } = harness();
 
 		await live.actions.save?.(context, {});

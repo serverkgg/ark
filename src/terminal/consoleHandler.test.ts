@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, it } from "bun:test";
 import { type Bridge, BridgeUserError } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import { releaseRcon, roster } from "../shared";
@@ -85,7 +85,7 @@ beforeEach(() => {
 });
 
 describe("parseConsoleLine", () => {
-	test("splits a name off its arguments", () => {
+	it("splits a name off its arguments", () => {
 		expect(parseConsoleLine("ServerChat hello there")).toEqual({
 			args: [
 				"hello",
@@ -97,22 +97,20 @@ describe("parseConsoleLine", () => {
 		});
 	});
 
-	// ARK's own console takes `cheat <command>`; over rcon a doubled prefix answers with
-	// nothing at all, so it is stripped before the line goes anywhere.
-	test("strips the cheat prefix the in-game console needs", () => {
+	it("strips the cheat prefix the in-game console needs", () => {
 		expect(parseConsoleLine("cheat SaveWorld").text).toBe("SaveWorld");
 		expect(parseConsoleLine("admincheat DestroyWildDinos").text).toBe("DestroyWildDinos");
 	});
 });
 
 describe("rosterLines", () => {
-	test("says plainly that nobody is on", () => {
+	it("says plainly that nobody is on", () => {
 		expect(rosterLines([])).toEqual([
 			"no players online",
 		]);
 	});
 
-	test("prints a header and one row per player", () => {
+	it("prints a header and one row per player", () => {
 		expect(
 			rosterLines([
 				{
@@ -129,7 +127,7 @@ describe("rosterLines", () => {
 });
 
 describe("consoleHandler", () => {
-	test("passes an unknown command through to rcon as it was typed", async () => {
+	it("passes an unknown command through to rcon as it was typed", async () => {
 		const { context, sent } = handlerContext({
 			"GiveItemNumToPlayer 1 1 1 0": "Gave item",
 		});
@@ -142,13 +140,13 @@ describe("consoleHandler", () => {
 		expect(reply?.line).toBe("Gave item");
 	});
 
-	test("says what it sent when the game answers with an empty body", async () => {
+	it("says what it sent when the game answers with an empty body", async () => {
 		const { context } = handlerContext({});
 
 		expect((await consoleHandler(context, "SaveWorld"))?.line).toBe("sent: SaveWorld");
 	});
 
-	test("resolves a player name to the account id the game acts on", async () => {
+	it("resolves a player name to the account id the game acts on", async () => {
 		const { context, emitted, sent } = handlerContext({
 			ListPlayers: `0. sara, ${EOS_ONE}`,
 		});
@@ -160,7 +158,7 @@ describe("consoleHandler", () => {
 		expect(emitted.at(-1)?.event).toBe("PlayerKicked");
 	});
 
-	test("bans an account id for someone who is not on", async () => {
+	it("bans an account id for someone who is not on", async () => {
 		const { context, sent } = handlerContext({
 			ListPlayers: "No Players Connected",
 		});
@@ -170,7 +168,7 @@ describe("consoleHandler", () => {
 		expect(sent).toContain(`BanPlayer ${EOS_ONE}`);
 	});
 
-	test("refuses a name that is neither online nor an account id", async () => {
+	it("refuses a name that is neither online nor an account id", async () => {
 		const { context } = handlerContext({
 			ListPlayers: "No Players Connected",
 		});
@@ -178,7 +176,7 @@ describe("consoleHandler", () => {
 		expect(consoleHandler(context, "KickPlayer nobody")).rejects.toThrow(BridgeUserError);
 	});
 
-	test("answers ListPlayers from the roster rather than the raw reply", async () => {
+	it("answers ListPlayers from the roster rather than the raw reply", async () => {
 		const { context } = handlerContext({
 			ListPlayers: `Keep Alive\n0. sara, ${EOS_ONE}`,
 		});
@@ -186,16 +184,14 @@ describe("consoleHandler", () => {
 		expect((await consoleHandler(context, "listplayers"))?.line).toBe(`name,eosid\nsara,${EOS_ONE}`);
 	});
 
-	// DoExit drops the process with nothing saved, and the platform's own Stop does the
-	// save and the bookkeeping, so the console never offers it as a working command.
-	test("refuses DoExit and points at the Stop button", async () => {
+	it("refuses DoExit and points at the Stop button", async () => {
 		const { context, sent } = handlerContext({});
 
 		expect(consoleHandler(context, "DoExit")).rejects.toThrow(BridgeUserError);
 		expect(sent).toEqual([]);
 	});
 
-	test("lets an empty line fall through untouched", async () => {
+	it("lets an empty line fall through untouched", async () => {
 		const { context } = handlerContext({});
 
 		expect(await consoleHandler(context, "   ")).toBeNull();

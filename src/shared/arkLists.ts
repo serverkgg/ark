@@ -2,13 +2,10 @@ import { type Bridge, BridgeUserError } from "@serverkgg/bridge";
 import { EOS_ID_PATTERN } from "./arkApp";
 
 export const BAD_EOS_ID: Bridge.Text = {
-	ar: "الصق رقم حساب اللاعب — 32 حرف ورقم، تلقاه في جدول اللاعبين.",
-	en: "Paste the player's account id — 32 letters and digits, straight from the players table.",
+	ar: "الصق معرّف اللاعب، وهو 32 حرفًا ورقمًا، وتجده في جدول اللاعبين.",
+	en: "Paste the player's account ID: 32 letters and digits, straight from the players table.",
 };
 
-// The ban list the game writes carries the account id first and its own trailing fields
-// after a comma; the admin and whitelist files are one bare id per line. Reading the
-// first field covers both.
 export const parseIdList = (content: string): string[] => {
 	const ids: string[] = [];
 	const seen = new Set<string>();

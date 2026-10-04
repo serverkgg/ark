@@ -14,13 +14,13 @@ const SIZE_TIMEOUT_MS = 120_000;
 const SAFE_NAME = /^[A-Za-z0-9_.-]+$/;
 
 const MISSING_SAVE: Bridge.Text = {
-	ar: "عالم الماب هذي ما عاد موجود.",
-	en: "That map's world is not there any more.",
+	ar: "حفظ هذه الماب لم يعد موجودًا.",
+	en: "That map's save isn't there anymore.",
 };
 
 export const worldWipedText = (map: Bridge.Text): Bridge.Text => {
 	return {
-		ar: `تم وايب ماب ${map.ar}، والتشغيل الجاي عليه يبدأ من جديد`,
+		ar: `تم وايب ماب ${map.ar}، ويبدأ التشغيل القادم عليها من جديد`,
 		en: `Wiped ${map.en}, the next start on that map begins fresh`,
 	};
 };
@@ -36,8 +36,6 @@ const megabytes = (size: number | undefined) => {
 	return size === undefined ? "" : `${Math.max(1, size)} MB`;
 };
 
-// context.files.list walks the whole volume, and this one holds eleven gigabytes of
-// cooked content, so the worlds are read with find and measured with du.
 const mapNames = async (context: Bridge.Context): Promise<string[]> => {
 	if (!(await context.files.exists(SAVED_ARKS_DIRECTORY))) {
 		return [];

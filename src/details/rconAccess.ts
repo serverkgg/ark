@@ -29,7 +29,7 @@ export const rconAccess: Bridge.Detail = createRconAccess({
 		reportAdminPasswordRotated(context, RCON_PASSWORD_TARGET);
 	},
 	tools: {
-		ar: "تشتغل معه BattleMetrics وأدوات RCON العادية. وهي نفسها كلمة مرور الأدمن داخل اللعبة، فتغييرها يغيّر الاثنين مع بعض.",
-		en: "BattleMetrics and the usual RCON tools work with it. It is also the in-game admin password, so rotating it changes both at once.",
+		ar: "تدعمه BattleMetrics وأدوات RCON المعتادة. وهي نفسها كلمة مرور الأدمن داخل اللعبة، فتغييرها يغيّر الاثنتين معًا.",
+		en: "BattleMetrics and the usual RCON tools work with it. It's also the in-game admin password, so rotating it changes both at once.",
 	},
 });

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { BridgeControl } from "@serverkgg/bridge";
 import {
 	GAME_FILE,
@@ -27,8 +27,6 @@ import {
 	validateSettingsWrite,
 } from "./arkSettings";
 
-// Game.ini legitimately repeats these keys, one line per override, and the ini codec
-// writes a single key per line — a form field for one of them would eat the rest.
 const REPEATED_GAME_KEYS = [
 	"ConfigAddNPCSpawnEntriesContainer",
 	"ConfigOverrideItemCraftingCosts",
@@ -50,11 +48,11 @@ const ALL_FIELDS = [
 ];
 
 describe("the settings table", () => {
-	test("names every key once", () => {
+	it("names every key once", () => {
 		expect(SETTING_BY_KEY.size).toBe(ARK_SETTINGS.length);
 	});
 
-	test("puts every key in one of the two ini files the game reads", () => {
+	it("puts every key in one of the two ini files the game reads", () => {
 		for (const setting of ARK_SETTINGS) {
 			expect([
 				GAME_FILE,
@@ -69,19 +67,19 @@ describe("the settings table", () => {
 		}
 	});
 
-	test("never offers a Game.ini key the file repeats", () => {
+	it("never offers a Game.ini key the file repeats", () => {
 		for (const key of REPEATED_GAME_KEYS) {
 			expect(SETTING_BY_KEY.has(key)).toBe(false);
 		}
 	});
 
-	test("lists each file and section once, so a read walks them once", () => {
+	it("lists each file and section once, so a read walks them once", () => {
 		const ids = SETTINGS_SECTIONS.map((section) => `${section.file} ${section.section}`);
 
 		expect(new Set(ids).size).toBe(ids.length);
 	});
 
-	test("keeps the server name to what the launch line can carry", () => {
+	it("keeps the server name to what the launch line can carry", () => {
 		const sessionName = SETTING_BY_KEY.get("SessionName");
 
 		expect(sessionName?.kind).toBe(ArkSettingKind.Text);
@@ -92,7 +90,7 @@ describe("the settings table", () => {
 		expect(sessionName?.patternHint).toBeDefined();
 	});
 
-	test("hides the join password from anyone who may not read it", () => {
+	it("hides the join password from anyone who may not read it", () => {
 		const password = SETTING_BY_KEY.get("ServerPassword");
 
 		expect(password?.kind).toBe(ArkSettingKind.Secret);
@@ -101,18 +99,18 @@ describe("the settings table", () => {
 });
 
 describe("the fields the panel renders", () => {
-	test("covers the whole table and nothing else", () => {
+	it("covers the whole table and nothing else", () => {
 		expect(ALL_FIELDS.map((field) => field.key).sort()).toEqual(ARK_SETTINGS.map((setting) => setting.key).sort());
 	});
 
-	test("labels every field in both languages", () => {
+	it("labels every field in both languages", () => {
 		for (const field of ALL_FIELDS) {
 			expect(field.label.ar.length).toBeGreaterThan(0);
 			expect(field.label.en.length).toBeGreaterThan(0);
 		}
 	});
 
-	test("maps each kind onto the control the web knows", () => {
+	it("maps each kind onto the control the web knows", () => {
 		const controls = new Map(
 			ALL_FIELDS.map((field) => [
 				field.key,
@@ -128,7 +126,7 @@ describe("the fields the panel renders", () => {
 });
 
 describe("settingValues", () => {
-	test("reads the ini text back as the type the form expects", () => {
+	it("reads the ini text back as the type the form expects", () => {
 		expect(
 			settingValues({
 				ServerPVE: "True",
@@ -142,7 +140,7 @@ describe("settingValues", () => {
 		});
 	});
 
-	test("falls back to the game's own default for a key the file never had", () => {
+	it("falls back to the game's own default for a key the file never had", () => {
 		expect(settingValues({})).toMatchObject({
 			AutoSavePeriodMinutes: 15,
 			ServerCrosshair: true,
@@ -153,7 +151,7 @@ describe("settingValues", () => {
 });
 
 describe("settingUpdates and settingsByFile", () => {
-	test("writes booleans the way ARK writes them", () => {
+	it("writes booleans the way ARK writes them", () => {
 		expect(
 			settingUpdates({
 				ServerHardcore: false,
@@ -165,7 +163,7 @@ describe("settingUpdates and settingsByFile", () => {
 		});
 	});
 
-	test("drops a key the table does not own", () => {
+	it("drops a key the table does not own", () => {
 		expect(
 			settingUpdates({
 				NotASetting: "1",
@@ -173,7 +171,7 @@ describe("settingUpdates and settingsByFile", () => {
 		).toEqual({});
 	});
 
-	test("splits one write across the files and sections it belongs to", () => {
+	it("splits one write across the files and sections it belongs to", () => {
 		const patches = settingsByFile(
 			settingUpdates({
 				MatingIntervalMultiplier: 0.5,
@@ -215,7 +213,7 @@ describe("settingUpdates and settingsByFile", () => {
 });
 
 describe("validateSettingsWrite", () => {
-	test("passes a write the table knows", () => {
+	it("passes a write the table knows", () => {
 		expect(
 			validateSettingsWrite({
 				ServerPVE: "true",
@@ -229,7 +227,7 @@ describe("validateSettingsWrite", () => {
 		});
 	});
 
-	test("refuses a key the panel does not own", () => {
+	it("refuses a key the panel does not own", () => {
 		expect(() =>
 			validateSettingsWrite({
 				ServerAdminPassword: "nope",
@@ -237,7 +235,7 @@ describe("validateSettingsWrite", () => {
 		).toThrow();
 	});
 
-	test("refuses an empty server name", () => {
+	it("refuses an empty server name", () => {
 		expect(() =>
 			validateSettingsWrite({
 				SessionName: "",
@@ -245,7 +243,7 @@ describe("validateSettingsWrite", () => {
 		).toThrow();
 	});
 
-	test("refuses a server name carrying the character that splits the launch line", () => {
+	it("refuses a server name carrying the character that splits the launch line", () => {
 		expect(() =>
 			validateSettingsWrite({
 				SessionName: "our tribe?listen",
@@ -253,7 +251,7 @@ describe("validateSettingsWrite", () => {
 		).toThrow();
 	});
 
-	test("refuses a join password longer than the game accepts", () => {
+	it("refuses a join password longer than the game accepts", () => {
 		expect(() =>
 			validateSettingsWrite({
 				ServerPassword: "p".repeat(PASSWORD_MAX + 1),
@@ -261,7 +259,7 @@ describe("validateSettingsWrite", () => {
 		).toThrow();
 	});
 
-	test("refuses a number outside the field", () => {
+	it("refuses a number outside the field", () => {
 		expect(() =>
 			validateSettingsWrite({
 				AutoSavePeriodMinutes: 0,
@@ -279,7 +277,7 @@ describe("validateSettingsWrite", () => {
 		).toThrow();
 	});
 
-	test("refuses a line break or a hidden character inside the message of the day", () => {
+	it("refuses a line break or a hidden character inside the message of the day", () => {
 		expect(() =>
 			validateSettingsWrite({
 				Message: "welcome\nto the tribe",
@@ -292,7 +290,7 @@ describe("validateSettingsWrite", () => {
 		).toThrow();
 	});
 
-	test("refuses a toggle that is neither on nor off", () => {
+	it("refuses a toggle that is neither on nor off", () => {
 		expect(() =>
 			validateSettingsWrite({
 				ServerPVE: "maybe",

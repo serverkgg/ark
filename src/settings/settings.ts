@@ -78,8 +78,6 @@ export const settings: Bridge.Settings = {
 		const patches = settingsByFile(updates);
 		const before = context.server.running ? await baselineFor(context, updates) : null;
 
-		// Writing the files now keeps a stopped server correct at once; a running one
-		// rewrites them from memory when it exits, which is what the parking is for.
 		for (const patch of patches) {
 			await mergeIniSection(context, patch.file, patch.section, patch.values);
 		}

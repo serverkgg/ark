@@ -52,7 +52,7 @@ export const reportModStaged = (context: Bridge.Context, mod: ArkModNoun) => {
 		name: BridgeEventName.ModEnabled,
 		subject: title,
 		text: {
-			ar: `تم تثبيت مود ${title}، وبينزل مع التشغيل الجاي`,
+			ar: `تم تثبيت مود ${title}، ويُنزَّل في التشغيل القادم`,
 			en: `Installed mod ${title}, it downloads on the next start`,
 		},
 	});
@@ -68,7 +68,7 @@ export const reportModRemoved = (context: Bridge.Context, mod: ArkModNoun) => {
 		name: BridgeEventName.ModRemoved,
 		subject: title,
 		text: {
-			ar: `تمت إزالة مود ${title}، والتغيير ينطبق مع التشغيل الجاي`,
+			ar: `تمت إزالة مود ${title}، ويُطبَّق التغيير في التشغيل القادم`,
 			en: `Removed mod ${title}, takes effect on the next start`,
 		},
 	});
@@ -85,11 +85,11 @@ export const reportModToggled = (context: Bridge.Context, mod: ArkModNoun, enabl
 		subject: title,
 		text: enabled
 			? {
-					ar: `تم تفعيل مود ${title}، والتغيير ينطبق مع التشغيل الجاي`,
+					ar: `تم تفعيل مود ${title}، ويُطبَّق التغيير في التشغيل القادم`,
 					en: `Enabled mod ${title}, takes effect on the next start`,
 				}
 			: {
-					ar: `تم إيقاف مود ${title}، والتغيير ينطبق مع التشغيل الجاي`,
+					ar: `تم إيقاف مود ${title}، ويُطبَّق التغيير في التشغيل القادم`,
 					en: `Disabled mod ${title}, takes effect on the next start`,
 				},
 	});
@@ -107,7 +107,7 @@ export const reportModMoved = (context: Bridge.Context, mod: ArkModNoun, positio
 		name: BridgeEventName.SettingsApplied,
 		subject: title,
 		text: {
-			ar: `تم نقل مود ${title} لرقم ${position} في ترتيب التحميل، والتغيير ينطبق مع التشغيل الجاي`,
+			ar: `تم نقل مود ${title} إلى الرقم ${position} في ترتيب التحميل، ويُطبَّق التغيير في التشغيل القادم`,
 			en: `Moved mod ${title} to number ${position} in the load order, takes effect on the next start`,
 		},
 	});

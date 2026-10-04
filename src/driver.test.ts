@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { BridgeFormTarget, BridgeKind, BridgeLayout, BridgePlace } from "@serverkgg/bridge";
 import { GuideOpenTab } from "@serverkgg/bridge/guides";
 import { BridgeSetupStepKind } from "@serverkgg/bridge/protocol";
@@ -30,9 +30,7 @@ const sections = () => {
 };
 
 describe("driver", () => {
-	// validateDriver is not on the package's public entry points, so the gate is run the
-	// way the runtime and the release path run it: through the maintainer CLI.
-	test("passes the validation the runtime runs before it boots", () => {
+	it("passes the validation the runtime runs before it boots", () => {
 		const validated = Bun.spawnSync([
 			"bunx",
 			"serverk-bridge",
@@ -44,7 +42,7 @@ describe("driver", () => {
 		expect(validated.exitCode).toBe(0);
 	});
 
-	test("carries every capability the panel leans on", () => {
+	it("carries every capability the panel leans on", () => {
 		expect(driver.install).toBeDefined();
 		expect(driver.lifecycle).toBeDefined();
 		expect(driver.query).toBeDefined();
@@ -54,7 +52,7 @@ describe("driver", () => {
 		expect(driver.terminal?.run).toBeDefined();
 	});
 
-	test("every section names a module the driver actually exports", () => {
+	it("every section names a module the driver actually exports", () => {
 		const modules = new Set(Object.keys(driver.modules ?? {}));
 
 		for (const section of sections()) {
@@ -66,11 +64,11 @@ describe("driver", () => {
 		}
 	});
 
-	test("registers the remote access module the shared sections call for", () => {
+	it("registers the remote access module the shared sections call for", () => {
 		expect(Object.keys(driver.modules ?? {})).toContain(RCON_ACCESS_MODULE);
 	});
 
-	test("registers every module the panel drives the game through", () => {
+	it("registers every module the panel drives the game through", () => {
 		const modules = Object.keys(driver.modules ?? {});
 
 		for (const id of [
@@ -86,14 +84,14 @@ describe("driver", () => {
 		}
 	});
 
-	test("writes the settings back rather than only reading them", () => {
+	it("writes the settings back rather than only reading them", () => {
 		const settings = driver.modules?.settings;
 
 		expect(settings?.kind).toBe(BridgeKind.Settings);
 		expect(settings && "write" in settings ? settings.write : undefined).toBeDefined();
 	});
 
-	test("lands every setup step on a form section and a field the panel really declares", () => {
+	it("lands every setup step on a form section and a field the panel really declares", () => {
 		for (const step of driver.setup?.steps ?? []) {
 			if (step.kind === BridgeSetupStepKind.Form) {
 				const tab = (driver.panel?.tabs ?? []).find((entry) => entry.id === step.tab);
@@ -118,7 +116,7 @@ describe("driver", () => {
 		}
 	});
 
-	test("leaves every setup step optional, because ARK boots with nothing asked of the customer", () => {
+	it("leaves every setup step optional, because ARK boots with nothing asked of the customer", () => {
 		expect(driver.setup?.steps.length).toBeGreaterThan(0);
 
 		for (const step of driver.setup?.steps ?? []) {
@@ -126,7 +124,7 @@ describe("driver", () => {
 		}
 	});
 
-	test("protects only wiping a save, the one action nothing else brings back", () => {
+	it("protects only wiping a save, the one action nothing else brings back", () => {
 		const protectedOf = (id: string) => {
 			const module = driver.modules?.[id];
 
@@ -150,7 +148,7 @@ describe("driver", () => {
 		}
 	});
 
-	test("every protected action is a mutation the module declares and runs while stopped", () => {
+	it("every protected action is a mutation the module declares and runs while stopped", () => {
 		for (const [id, module] of Object.entries(driver.modules ?? {})) {
 			const declared =
 				module.kind === BridgeKind.Collection
@@ -187,7 +185,7 @@ describe("driver", () => {
 		}
 	});
 
-	test("gives the roster, the metrics and the admin card a help line in both languages", () => {
+	it("gives the roster, the metrics and the admin card a help line in both languages", () => {
 		for (const id of [
 			"online",
 			"metrics",
@@ -200,7 +198,7 @@ describe("driver", () => {
 		}
 	});
 
-	test("puts the roster on the Players page and the metrics on the Overview", () => {
+	it("puts the roster on the Players page and the metrics on the Overview", () => {
 		const online = sections().find((section) => section.module === "players");
 		const metrics = sections().find((section) => section.module === "metrics");
 
@@ -210,12 +208,12 @@ describe("driver", () => {
 		expect(metrics && "place" in metrics ? metrics.place : null).toBe(BridgePlace.Overview);
 	});
 
-	test("declares the wine runtime the proton image needs", () => {
+	it("declares the wine runtime the proton image needs", () => {
 		expect(manifest.container.runtime.platform).toBe("wine");
 		expect(manifest.container.runtime.shmMb).toBeGreaterThanOrEqual(256);
 	});
 
-	test("reset keeps every game root and the proton prefix", () => {
+	it("reset keeps every game root and the proton prefix", () => {
 		const keep = compileGlobs(manifest.reset.keep);
 
 		for (const root of GAME_ROOTS) {
@@ -227,25 +225,25 @@ describe("driver", () => {
 		expect(manifest.reset.keep).toContain("steamapps");
 	});
 
-	test("reset drops the mods sidecar, so it really wipes the mods the reset dialog promises to wipe", () => {
+	it("reset drops the mods sidecar, so it really wipes the mods the reset dialog promises to wipe", () => {
 		expect(manifest.reset.keep).not.toContain(MODS_SIDECAR_FILE);
 	});
 
-	test("reset keeps the mod payloads under the binaries, which the cleared list leaves inert", () => {
+	it("reset keeps the mod payloads under the binaries, which the cleared list leaves inert", () => {
 		expect(matchesAny(MODS_DIRECTORY, compileGlobs(manifest.reset.keep))).toBe(true);
 	});
 
-	test("the backup names the saves and both sidecars rather than excluding the install", () => {
+	it("the backup names the saves and both sidecars rather than excluding the install", () => {
 		expect(manifest.backup.only).toContain("ShooterGame/Saved/**");
 		expect(manifest.backup.only).toContain(".serverk-install.json");
 		expect(manifest.backup.only).toContain(MODS_SIDECAR_FILE);
 	});
 
-	test("the mods sidecar stays protected, so a restore is the only thing that rewrites the list", () => {
+	it("the mods sidecar stays protected, so a restore is the only thing that rewrites the list", () => {
 		expect(manifest.files.protected).toContain(MODS_SIDECAR_FILE);
 	});
 
-	test("the backup carries the moderation lists the panel writes outside the saves", () => {
+	it("the backup carries the moderation lists the panel writes outside the saves", () => {
 		expect(manifest.backup.only).toContain(BAN_LIST_FILE);
 		expect(manifest.backup.only).toContain(WHITELIST_FILE);
 	});

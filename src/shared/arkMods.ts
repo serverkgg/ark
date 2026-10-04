@@ -5,13 +5,13 @@ import { MOD_LIST_LIMIT, MODS_SIDECAR_FILE } from "./arkApp";
 const PROJECT_ID = /^\d{2,10}$/;
 
 export const MOD_LIMIT_REACHED: Bridge.Text = {
-	ar: `وصلت الحد — ${MOD_LIST_LIMIT} مود لكل سيرفر. شيل واحد قبل ما تضيف غيره.`,
-	en: `You are at the limit — ${MOD_LIST_LIMIT} mods per server. Remove one before adding another.`,
+	ar: `وصلت إلى الحد الأقصى، وهو ${MOD_LIST_LIMIT} مود لكل سيرفر. أزل مودًا قبل إضافة غيره.`,
+	en: `You're at the limit of ${MOD_LIST_LIMIT} mods per server. Remove one before adding another.`,
 };
 
 export const BAD_PROJECT_ID: Bridge.Text = {
-	ar: "رقم المود أرقام بس — هو Project ID اللي في صندوق About في صفحة المود على CurseForge.",
-	en: "A mod id is digits only — it is the Project ID in the About box on the mod's CurseForge page.",
+	ar: "رقم المود أرقام فقط، وهو Project ID الموجود في صندوق About في صفحة المود على CurseForge.",
+	en: "A mod ID is digits only. It's the Project ID in the About box on the mod's CurseForge page.",
 };
 
 export interface ArkMod {

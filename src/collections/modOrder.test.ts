@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { MOD_ORDER_TARGET, MODS_SIDECAR_FILE, readMods } from "../shared";
@@ -65,7 +65,7 @@ const harness = (
 };
 
 describe("the load order table", () => {
-	test("numbers the rows the way the launch line carries them", async () => {
+	it("numbers the rows the way the launch line carries them", async () => {
 		const { context } = harness([
 			{
 				projectId: "111111",
@@ -92,7 +92,7 @@ describe("the load order table", () => {
 				order: 2,
 				projectId: "222222",
 				state: {
-					ar: "مطفي",
+					ar: "موقوف",
 					en: "Disabled",
 				},
 				title: "222222",
@@ -100,7 +100,7 @@ describe("the load order table", () => {
 		]);
 	});
 
-	test("takes a raw mod id", async () => {
+	it("takes a raw mod id", async () => {
 		const { context, ids } = harness();
 
 		await modOrder.add?.(context, " 928437 ");
@@ -110,7 +110,7 @@ describe("the load order table", () => {
 		]);
 	});
 
-	test("refuses a page link and says to paste the id instead", async () => {
+	it("refuses a page link and says to paste the id instead", async () => {
 		const { context } = harness();
 
 		await expect(
@@ -118,7 +118,7 @@ describe("the load order table", () => {
 		).rejects.toThrow();
 	});
 
-	test("refuses anything that is not digits", async () => {
+	it("refuses anything that is not digits", async () => {
 		const { context } = harness();
 
 		await expect(modOrder.add?.(context, "structures-plus")).rejects.toThrow();
@@ -126,7 +126,7 @@ describe("the load order table", () => {
 });
 
 describe("reordering", () => {
-	test("moves a mod up and down the list", async () => {
+	it("moves a mod up and down the list", async () => {
 		const { context, ids } = harness([
 			{
 				projectId: "111111",
@@ -163,7 +163,7 @@ describe("reordering", () => {
 		]);
 	});
 
-	test("stays put at the end of the list rather than falling off it", async () => {
+	it("stays put at the end of the list rather than falling off it", async () => {
 		const { context, ids } = harness([
 			{
 				projectId: "111111",
@@ -183,7 +183,7 @@ describe("reordering", () => {
 		]);
 	});
 
-	test("flips a mod off and back on", async () => {
+	it("flips a mod off and back on", async () => {
 		const { context } = harness([
 			{
 				projectId: "111111",
@@ -202,7 +202,7 @@ describe("reordering", () => {
 		expect((await readMods(context)).mods.at(0)?.enabled).toBe(true);
 	});
 
-	test("drops a mod from the list", async () => {
+	it("drops a mod from the list", async () => {
 		const { context, ids } = harness([
 			{
 				projectId: "111111",
@@ -222,7 +222,7 @@ describe("reordering", () => {
 });
 
 describe("the activity the load order table reports", () => {
-	test("reports a staged id as enabled and waiting for the next start, never as installed", async () => {
+	it("reports a staged id as enabled and waiting for the next start, never as installed", async () => {
 		const { context, reported } = harness();
 
 		await modOrder.add?.(context, "928437");
@@ -240,7 +240,7 @@ describe("the activity the load order table reports", () => {
 		expect(reported.at(0)?.text.en).toContain("next start");
 	});
 
-	test("reports nothing when the id is already on the list", async () => {
+	it("reports nothing when the id is already on the list", async () => {
 		const { context, reported } = harness([
 			{
 				projectId: "928437",
@@ -252,7 +252,7 @@ describe("the activity the load order table reports", () => {
 		expect(reported).toEqual([]);
 	});
 
-	test("reports a move as a load order change with the new position", async () => {
+	it("reports a move as a load order change with the new position", async () => {
 		const { context, reported } = harness([
 			{
 				projectId: "111111",
@@ -283,7 +283,7 @@ describe("the activity the load order table reports", () => {
 		]);
 	});
 
-	test("reports nothing for a move that cannot happen", async () => {
+	it("reports nothing for a move that cannot happen", async () => {
 		const { context, reported } = harness([
 			{
 				projectId: "111111",
@@ -301,7 +301,7 @@ describe("the activity the load order table reports", () => {
 		expect(reported).toEqual([]);
 	});
 
-	test("reports a toggle and a removal by their own names", async () => {
+	it("reports a toggle and a removal by their own names", async () => {
 		const { context, reported } = harness([
 			{
 				projectId: "111111",

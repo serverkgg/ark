@@ -13,7 +13,7 @@ export const setup: Bridge.Setup = {
 				"Message",
 			],
 			help: {
-				ar: "الاسم اللي يشوفونه اللاعبين في قائمة Unofficial، وكلمة مرور لو تبي سيرفرك خاص.",
+				ar: "الاسم الذي يراه اللاعبون في قائمة Unofficial، وكلمة مرور إذا أردت سيرفرك خاصًا.",
 				en: "The name players see under Unofficial, and a password if you want your server private.",
 			},
 			id: "name",
@@ -34,8 +34,8 @@ export const setup: Bridge.Setup = {
 				CROSSPLAY_VARIABLE,
 			],
 			help: {
-				ar: "اختر الماب وعدد الخانات من الحين. كل ماب لها عالمها الخاص، والتبديل بعدين ما يمسح شيء.",
-				en: "Pick the map and the number of slots now. Every map keeps its own world, so switching later deletes nothing.",
+				ar: "اختر الماب وعدد الخانات الآن. لكل ماب حفظها الخاص، والتبديل لاحقًا لا يحذف شيئًا.",
+				en: "Pick the map and the number of slots now. Every map keeps its own save, so switching later deletes nothing.",
 			},
 			id: "launch",
 			kind: BridgeSetupStepKind.Form,
@@ -49,8 +49,8 @@ export const setup: Bridge.Setup = {
 		},
 		{
 			help: {
-				ar: "دوّر على المودات اللي تبيها وركّبها، وسيرفرك ينزّلها بنفسه في أول تشغيل بعدها.",
-				en: "Find the mods you want and stage them; your server downloads them itself on the next start.",
+				ar: "ابحث عن المودات التي تريدها وثبّتها، وسينزّلها سيرفرك بنفسه في التشغيل التالي.",
+				en: "Find the mods you want and install them, and your server downloads them itself on the next start.",
 			},
 			id: "mods",
 			kind: BridgeSetupStepKind.Open,
@@ -60,13 +60,13 @@ export const setup: Bridge.Setup = {
 				tabId: "mods",
 			},
 			title: {
-				ar: "ركّب مودات",
+				ar: "ثبّت مودات",
 				en: "Add some mods",
 			},
 		},
 		{
 			help: {
-				ar: "انسخ عنوان سيرفرك وارسله لأصحابك.",
+				ar: "انسخ عنوان سيرفرك وأرسله لأصحابك.",
 				en: "Copy your server address and send it to your friends.",
 			},
 			id: "invite",
@@ -76,7 +76,7 @@ export const setup: Bridge.Setup = {
 				tab: GuideOpenTab.Access,
 			},
 			title: {
-				ar: "عزم أصحابك",
+				ar: "ادعُ أصحابك",
 				en: "Invite your friends",
 			},
 		},

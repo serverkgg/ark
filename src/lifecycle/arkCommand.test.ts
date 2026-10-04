@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import { type ArkCommandInput, mapString, sanitizeSessionName, startArgs } from "./arkCommand";
+import { describe, expect, it } from "bun:test";
+import { type ArkCommandInput, mapStringWithoutSecrets, sanitizeSessionName, startArgs } from "./arkCommand";
 
 const input = (overrides: Partial<ArkCommandInput> = {}): ArkCommandInput => ({
 	battleye: false,
@@ -15,29 +15,29 @@ const input = (overrides: Partial<ArkCommandInput> = {}): ArkCommandInput => ({
 });
 
 describe("sanitizeSessionName", () => {
-	test("drops the separator the launch string is built out of", () => {
+	it("drops the separator the launch string is built out of", () => {
 		expect(sanitizeSessionName("my?server")).toBe("myserver");
 	});
 
-	test("flattens newlines and trims", () => {
+	it("flattens newlines and trims", () => {
 		expect(sanitizeSessionName("  my\nserver  ")).toBe("my server");
 	});
 });
 
-describe("mapString", () => {
-	test("carries the map, the name and the rcon switch and nothing else", () => {
-		expect(mapString(input())).toBe(
+describe("mapStringWithoutSecrets", () => {
+	it("carries the map, the name and the rcon switch and nothing else", () => {
+		expect(mapStringWithoutSecrets(input())).toBe(
 			"TheIsland_WP?listen?SessionName=Serverk ARK abc123?RCONPort=27020?RCONEnabled=True",
 		);
 	});
 
-	test("names no password, because the engine prints its own command line into the log", () => {
-		expect(mapString(input())).not.toContain("Password");
+	it("names no password, because the engine prints its own command line into the log", () => {
+		expect(mapStringWithoutSecrets(input())).not.toContain("Password");
 	});
 
-	test("reads the rcon port from the input rather than a constant", () => {
+	it("reads the rcon port from the input rather than a constant", () => {
 		expect(
-			mapString(
+			mapStringWithoutSecrets(
 				input({
 					rconPort: 27_021,
 				}),
@@ -45,17 +45,17 @@ describe("mapString", () => {
 		).toContain("?RCONPort=27021?");
 	});
 
-	test("never carries the game port, because the engine ignores it inside the map string", () => {
-		expect(mapString(input())).not.toContain("?Port=");
+	it("never carries the game port, because the engine ignores it inside the map string", () => {
+		expect(mapStringWithoutSecrets(input())).not.toContain("?Port=");
 	});
 });
 
 describe("startArgs", () => {
-	test("keeps the launch string first", () => {
+	it("keeps the launch string first", () => {
 		expect(startArgs(input()).at(0)).toStartWith("TheIsland_WP?listen");
 	});
 
-	test("passes the game port as a flag, right after the launch string", () => {
+	it("passes the game port as a flag, right after the launch string", () => {
 		expect(startArgs(input()).at(1)).toBe("-Port=9001");
 
 		expect(
@@ -67,7 +67,7 @@ describe("startArgs", () => {
 		).toBe("-Port=9007");
 	});
 
-	test("never lets a password reach argv, whatever the toggles", () => {
+	it("never lets a password reach argv, whatever the toggles", () => {
 		const args = startArgs(
 			input({
 				battleye: true,
@@ -83,7 +83,7 @@ describe("startArgs", () => {
 		expect(args.join(" ")).not.toContain("Password");
 	});
 
-	test("clamps the slot count into the range the game accepts", () => {
+	it("clamps the slot count into the range the game accepts", () => {
 		expect(
 			startArgs(
 				input({
@@ -101,7 +101,7 @@ describe("startArgs", () => {
 		).toContain("-WinLiveMaxPlayers=1");
 	});
 
-	test("adds -mods only when there is a mod to load", () => {
+	it("adds -mods only when there is a mod to load", () => {
 		expect(startArgs(input()).some((arg) => arg.startsWith("-mods="))).toBe(false);
 
 		expect(
@@ -116,7 +116,7 @@ describe("startArgs", () => {
 		).toContain("-mods=893657,928988");
 	});
 
-	test("carries the always-on flags", () => {
+	it("carries the always-on flags", () => {
 		const args = startArgs(input());
 
 		expect(args).toContain("-servergamelog");
@@ -124,7 +124,7 @@ describe("startArgs", () => {
 		expect(args).toContain("-nosteam");
 	});
 
-	test("turns BattlEye off unless it was asked for", () => {
+	it("turns BattlEye off unless it was asked for", () => {
 		expect(startArgs(input())).toContain("-NoBattlEye");
 
 		expect(
@@ -136,7 +136,7 @@ describe("startArgs", () => {
 		).not.toContain("-NoBattlEye");
 	});
 
-	test("opens crossplay and exclusive join only on their toggles", () => {
+	it("opens crossplay and exclusive join only on their toggles", () => {
 		expect(startArgs(input())).toContain("-ServerPlatform=ALL");
 
 		expect(

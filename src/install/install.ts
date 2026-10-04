@@ -22,7 +22,7 @@ import { seedConfig } from "./seedConfig";
 const LABEL = "ARK: Survival Ascended";
 
 export const GAME_FILES_MISSING: Bridge.Text = {
-	ar: "التنزيل خلص بس ملفات اللعبة ناقصة. جرّب التثبيت مرة ثانية.",
+	ar: "اكتمل التنزيل لكن ملفات اللعبة ناقصة. جرب التثبيت مرة ثانية.",
 	en: "The download finished but the game files are missing. Try the install again.",
 };
 
@@ -113,7 +113,7 @@ export const reportGameInstalled = (context: Bridge.Context, buildId: string | n
 		name: BridgeEventName.GameInstalled,
 		subject: LABEL,
 		text: {
-			ar: "تم تثبيت آرك سيرفايفل أسندد، والسيرفر جاهز يشتغل",
+			ar: "تم تثبيت آرك سيرفايفل أسندد، والسيرفر جاهز للتشغيل",
 			en: "Installed ARK: Survival Ascended, the server is ready to start",
 		},
 	});
@@ -147,9 +147,6 @@ export const install: Bridge.Install = {
 
 		await requireGameFiles(context);
 
-		// No linkSteamClient: the payload is the Windows build, and the Linux steamclient
-		// shared objects it would drop are read by nothing here. Proton needs its own
-		// prefix instead, and it belongs to the volume rather than to the image.
 		await prepareWinePrefix(context, {
 			appId: STEAM_APP_ID,
 			proton: true,

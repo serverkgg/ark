@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
@@ -70,7 +70,7 @@ const harness = (launch?: Record<string, string> | string, failWrites = false) =
 };
 
 describe("launchChanges", () => {
-	test("names only the keys that were there before and moved", () => {
+	it("names only the keys that were there before and moved", () => {
 		expect(
 			launchChanges(
 				{
@@ -96,7 +96,7 @@ describe("launchChanges", () => {
 });
 
 describe("applying the launch variables at boot", () => {
-	test("records the first boot quietly", async () => {
+	it("records the first boot quietly", async () => {
 		const { context, reported } = harness();
 
 		await applyLaunchVariables(context, await readArkStamp(context), ISLAND);
@@ -105,7 +105,7 @@ describe("applying the launch variables at boot", () => {
 		expect((await readArkStamp(context)).launch).toEqual(launchSnapshot(ISLAND));
 	});
 
-	test("reports nothing when nothing moved", async () => {
+	it("reports nothing when nothing moved", async () => {
 		const { context, reported } = harness(launchSnapshot(ISLAND));
 
 		await applyLaunchVariables(context, await readArkStamp(context), ISLAND);
@@ -113,7 +113,7 @@ describe("applying the launch variables at boot", () => {
 		expect(reported).toEqual([]);
 	});
 
-	test("reports a new map by its display name beside the one it replaced", async () => {
+	it("reports a new map by its display name beside the one it replaced", async () => {
 		const { context, reported } = harness(launchSnapshot(ISLAND));
 
 		await applyLaunchVariables(context, await readArkStamp(context), {
@@ -138,7 +138,7 @@ describe("applying the launch variables at boot", () => {
 		expect((await readArkStamp(context)).launch[MAP_VARIABLE]).toBe("Ragnarok_WP");
 	});
 
-	test("reports the other launch options by key name and count", async () => {
+	it("reports the other launch options by key name and count", async () => {
 		const { context, reported } = harness(launchSnapshot(ISLAND));
 
 		await applyLaunchVariables(context, await readArkStamp(context), {
@@ -159,7 +159,7 @@ describe("applying the launch variables at boot", () => {
 		]);
 	});
 
-	test("starts anyway and reports nothing when the stamp cannot be written", async () => {
+	it("starts anyway and reports nothing when the stamp cannot be written", async () => {
 		const { context, reported, warnings } = harness(launchSnapshot(ISLAND), true);
 
 		await applyLaunchVariables(context, await readArkStamp(context), {
@@ -171,7 +171,7 @@ describe("applying the launch variables at boot", () => {
 		expect(warnings).toHaveLength(1);
 	});
 
-	test("treats a malformed launch record as a first boot", async () => {
+	it("treats a malformed launch record as a first boot", async () => {
 		const { context, reported } = harness("not a record");
 
 		await applyLaunchVariables(context, await readArkStamp(context), ISLAND);
@@ -180,7 +180,7 @@ describe("applying the launch variables at boot", () => {
 		expect((await readArkStamp(context)).launch).toEqual(launchSnapshot(ISLAND));
 	});
 
-	test("reports nothing when the stored value only differs in how it is written", async () => {
+	it("reports nothing when the stored value only differs in how it is written", async () => {
 		const { context, reported } = harness({
 			...launchSnapshot(ISLAND),
 			[CROSSPLAY_VARIABLE]: "True",
@@ -195,7 +195,7 @@ describe("applying the launch variables at boot", () => {
 });
 
 describe("worldActivatedText", () => {
-	test("never puts an article in front of a map name, for every official map", () => {
+	it("never puts an article in front of a map name, for every official map", () => {
 		for (const from of OFFICIAL_MAPS) {
 			for (const to of OFFICIAL_MAPS) {
 				const text = worldActivatedText(from.name, to.name);

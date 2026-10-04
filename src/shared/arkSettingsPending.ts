@@ -271,7 +271,7 @@ export const replayPendingSettings = async (context: Bridge.Context, stamp: ArkS
 		},
 		name: BridgeEventName.SettingsApplied,
 		text: {
-			ar: `تم تطبيق الإعدادات اللي كانت تنتظر التشغيل (${keys.length})`,
+			ar: `تم تطبيق الإعدادات التي كانت بانتظار التشغيل (${keys.length})`,
 			en: `Applied the settings that were waiting for the next start (${keys.length})`,
 		},
 	});

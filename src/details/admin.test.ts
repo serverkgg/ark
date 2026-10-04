@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
@@ -62,7 +62,7 @@ const secretsOf = async (context: Bridge.Context) => {
 };
 
 describe("rotating the admin password", () => {
-	test("reports the rotation by its target alone from the admin card", async () => {
+	it("reports the rotation by its target alone from the admin card", async () => {
 		const { context, reported } = harness();
 
 		await admin.actions?.[ROTATE_ACTION]?.(context, {});
@@ -82,7 +82,7 @@ describe("rotating the admin password", () => {
 		}
 	});
 
-	test("reports the rotation by its target alone from the remote access card", async () => {
+	it("reports the rotation by its target alone from the remote access card", async () => {
 		const { context, reported } = harness();
 
 		await rconAccess.actions?.[RCON_ACCESS_ROTATE]?.(context, {});

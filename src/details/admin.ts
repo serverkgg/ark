@@ -17,7 +17,7 @@ export const adminBadge = (stamp: ArkStamp): Bridge.DetailBadge => {
 	if (stamp.adminPasswordNext !== null) {
 		return {
 			label: {
-				ar: "يطبّق بعد إعادة التشغيل",
+				ar: "يُطبَّق بعد الريستارت",
 				en: "Applies after restart",
 			},
 			tone: BridgeDetailTone.Warning,
@@ -36,7 +36,7 @@ export const adminBadge = (stamp: ArkStamp): Bridge.DetailBadge => {
 
 	return {
 		label: {
-			ar: "شغّل سيرفرك مرة عشان تتولد",
+			ar: "شغّل سيرفرك مرة واحدة لتُنشأ",
 			en: "Start the server once to generate it",
 		},
 		tone: BridgeDetailTone.Warning,
@@ -57,7 +57,7 @@ export const admin: Bridge.Detail = {
 				adminBadge(stamp),
 			],
 			description: {
-				ar: "داخل اللعبة افتح الكونسول بزر Tab واكتب EnableCheats مع كلمة المرور هذي، وتصير أدمن على طول. ونفس الكلمة هي كلمة مرور RCON، فلا تعطيها إلا اللي تثق فيه.",
+				ar: "داخل اللعبة افتح الكونسول بزر Tab واكتب EnableCheats مع كلمة المرور هذه، لتصبح أدمن فورًا. وهي نفسها كلمة مرور RCON، فلا تعطها إلا لمن تثق به.",
 				en: "In game, open the console with Tab and type EnableCheats followed by this password to become admin. The same password is the RCON password, so share it only with people you trust.",
 			},
 			id: DETAIL_ID,
@@ -78,7 +78,7 @@ export const admin: Bridge.Detail = {
 					format: BridgeDetailFormat.Text,
 					key: "build",
 					label: {
-						ar: "نسخة اللعبة",
+						ar: "بيلد اللعبة",
 						en: "Game build",
 					},
 					value: stamp.buildId ?? "",
@@ -95,8 +95,6 @@ export const admin: Bridge.Detail = {
 		};
 	},
 	actions: {
-		// ARK reads ServerAdminPassword off the launch string once, at boot, so the new
-		// one waits in the stamp and the boot path promotes it before the process starts.
 		async [ROTATE_ACTION](context) {
 			await rotateAdminPassword(context);
 

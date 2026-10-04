@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
@@ -90,7 +90,7 @@ beforeEach(() => {
 });
 
 describe("listing the bans", () => {
-	test("reads the ids out of the file the game keeps", async () => {
+	it("reads the ids out of the file the game keeps", async () => {
 		const { context } = harness({
 			banned: [
 				FIRST,
@@ -111,7 +111,7 @@ describe("listing the bans", () => {
 		]);
 	});
 
-	test("reads the id out of a line the game wrote with its own trailing fields", async () => {
+	it("reads the id out of a line the game wrote with its own trailing fields", async () => {
 		const { context } = harness({
 			banned: [
 				`${FIRST},"someone",0`,
@@ -132,7 +132,7 @@ describe("listing the bans", () => {
 		]);
 	});
 
-	test("answers with nothing at all before the file exists", async () => {
+	it("answers with nothing at all before the file exists", async () => {
 		const { context } = harness({
 			running: false,
 		});
@@ -142,7 +142,7 @@ describe("listing the bans", () => {
 });
 
 describe("banning an account", () => {
-	test("leaves the file to the running server and only sends the command", async () => {
+	it("leaves the file to the running server and only sends the command", async () => {
 		const { context, file, sent } = harness({
 			running: true,
 		});
@@ -155,7 +155,7 @@ describe("banning an account", () => {
 		expect(file()).toBe("");
 	});
 
-	test("edits the file alone while the server is down", async () => {
+	it("edits the file alone while the server is down", async () => {
 		const { context, file, sent } = harness({
 			running: false,
 		});
@@ -166,7 +166,7 @@ describe("banning an account", () => {
 		expect(file()).toBe(`${FIRST}\n`);
 	});
 
-	test("raises the event the activity feed reads", async () => {
+	it("raises the event the activity feed reads", async () => {
 		const { context, emitted } = harness({
 			running: false,
 		});
@@ -178,7 +178,7 @@ describe("banning an account", () => {
 		]);
 	});
 
-	test("refuses anything that is not an account id", async () => {
+	it("refuses anything that is not an account id", async () => {
 		const { context } = harness({
 			running: false,
 		});
@@ -188,7 +188,7 @@ describe("banning an account", () => {
 });
 
 describe("lifting a ban", () => {
-	test("leaves the file to the running server and only sends the command", async () => {
+	it("leaves the file to the running server and only sends the command", async () => {
 		const { context, file, sent } = harness({
 			banned: [
 				FIRST,
@@ -212,7 +212,7 @@ describe("lifting a ban", () => {
 		expect(file()).toBe(`${FIRST}\n${SECOND}\n`);
 	});
 
-	test("edits the file alone while the server is down", async () => {
+	it("edits the file alone while the server is down", async () => {
 		const { context, file, sent } = harness({
 			banned: [
 				FIRST,
@@ -236,7 +236,7 @@ describe("lifting a ban", () => {
 });
 
 describe("the activity a ban change reports", () => {
-	test("names the banned account and keeps the event beside it", async () => {
+	it("names the banned account and keeps the event beside it", async () => {
 		const { context, emitted, reported } = harness({
 			running: true,
 		});
@@ -258,7 +258,7 @@ describe("the activity a ban change reports", () => {
 		expect(JSON.stringify(reported)).not.toContain("live");
 	});
 
-	test("reports a lifted ban as an unban of that account", async () => {
+	it("reports a lifted ban as an unban of that account", async () => {
 		const { context, reported } = harness({
 			banned: [
 				FIRST,

@@ -16,8 +16,6 @@ export const adminRow = (eosId: string): ArkAdminRow => {
 	};
 };
 
-// An account on this list is admin without typing the password. ARK reads the file at
-// boot, so the panel says the change lands on the next start.
 export const admins: Bridge.Collection = {
 	kind: BridgeKind.Collection,
 	refreshSeconds: REFRESH_SECONDS,
@@ -36,7 +34,7 @@ export const admins: Bridge.Collection = {
 			name: BridgeEventName.AccessGranted,
 			subject: eosId,
 			text: {
-				ar: `تمت إضافة الحساب ${eosId} لقائمة الأدمن، والتغيير ينطبق مع التشغيل الجاي`,
+				ar: `تمت إضافة الحساب ${eosId} إلى قائمة الأدمن، ويُطبَّق التغيير في التشغيل القادم`,
 				en: `Added account ${eosId} to the admin list, takes effect on the next start`,
 			},
 		});
@@ -58,7 +56,7 @@ export const admins: Bridge.Collection = {
 				name: BridgeEventName.AccessRevoked,
 				subject: eosId,
 				text: {
-					ar: `تمت إزالة الحساب ${eosId} من قائمة الأدمن، والتغيير ينطبق مع التشغيل الجاي`,
+					ar: `تمت إزالة الحساب ${eosId} من قائمة الأدمن، ويُطبَّق التغيير في التشغيل القادم`,
 					en: `Removed account ${eosId} from the admin list, takes effect on the next start`,
 				},
 			});

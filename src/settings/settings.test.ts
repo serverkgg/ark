@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
@@ -108,7 +108,7 @@ const harness = (options: { running: boolean; ini?: Record<string, Record<string
 };
 
 describe("reading the settings the panel shows", () => {
-	test("shows what the two ini files say while nothing is parked", async () => {
+	it("shows what the two ini files say while nothing is parked", async () => {
 		const { context } = harness({
 			ini: {
 				[GAME_FILE]: {
@@ -135,7 +135,7 @@ describe("reading the settings the panel shows", () => {
 		});
 	});
 
-	test("shows the owner his own value after the game rewrote the ini on shutdown", async () => {
+	it("shows the owner his own value after the game rewrote the ini on shutdown", async () => {
 		const { context, section } = harness({
 			ini: {
 				[GAME_USER_SETTINGS_FILE]: {
@@ -160,7 +160,7 @@ describe("reading the settings the panel shows", () => {
 });
 
 describe("writing a setting while the game is running", () => {
-	test("writes it into the ini the game reads at its next start", async () => {
+	it("writes it into the ini the game reads at its next start", async () => {
 		const { context, section } = harness({
 			running: true,
 		});
@@ -172,7 +172,7 @@ describe("writing a setting while the game is running", () => {
 		expect(section(GAME_USER_SETTINGS_FILE, SERVER_SETTINGS_SECTION).XPMultiplier).toBe("3");
 	});
 
-	test("parks it too, because the game rewrites the ini when it shuts down", async () => {
+	it("parks it too, because the game rewrites the ini when it shuts down", async () => {
 		const { context } = harness({
 			running: true,
 		});
@@ -188,7 +188,7 @@ describe("writing a setting while the game is running", () => {
 		});
 	});
 
-	test("puts a breeding key in Game.ini rather than in the settings the game rewrites", async () => {
+	it("puts a breeding key in Game.ini rather than in the settings the game rewrites", async () => {
 		const { context, section } = harness({
 			running: true,
 		});
@@ -203,7 +203,7 @@ describe("writing a setting while the game is running", () => {
 		});
 	});
 
-	test("refuses a value outside the field before anything is written or parked", async () => {
+	it("refuses a value outside the field before anything is written or parked", async () => {
 		const { context, section } = harness({
 			running: true,
 		});
@@ -220,7 +220,7 @@ describe("writing a setting while the game is running", () => {
 });
 
 describe("writing a setting while the game is stopped", () => {
-	test("writes it into the ini, which nothing is going to overwrite", async () => {
+	it("writes it into the ini, which nothing is going to overwrite", async () => {
 		const { context, section } = harness({
 			running: false,
 		});
@@ -233,7 +233,7 @@ describe("writing a setting while the game is stopped", () => {
 		expect((await readArkStamp(context)).settingsPending).toEqual({});
 	});
 
-	test("drops the older running write so the next start does not replay it over this one", async () => {
+	it("drops the older running write so the next start does not replay it over this one", async () => {
 		const { context, server } = harness({
 			running: true,
 		});
@@ -257,10 +257,6 @@ describe("writing a setting while the game is stopped", () => {
 	});
 });
 
-// The platform's own ini codec is not reachable from a game package — @serverkgg/bridge
-// exports no "./codecs" subpath — so this stand-in follows the same contract: comments,
-// section headers and untouched lines are copied through, a known key is rewritten in
-// place, and an unknown one is appended to the end of its section.
 const readIniText = (contents: string, section: string) => {
 	const values: Record<string, string> = {};
 
@@ -412,7 +408,7 @@ const textHarness = (contents: string) => {
 };
 
 describe("the file the game actually writes", () => {
-	test("reads past the metadata line the game puts before the first section", async () => {
+	it("reads past the metadata line the game puts before the first section", async () => {
 		const { context } = textHarness(PREAMBLE_INI);
 
 		expect(await settings.read(context)).toMatchObject({
@@ -422,7 +418,7 @@ describe("the file the game actually writes", () => {
 		});
 	});
 
-	test("a write leaves the metadata line, the blank join password and every other line alone", async () => {
+	it("a write leaves the metadata line, the blank join password and every other line alone", async () => {
 		const { context, text } = textHarness(PREAMBLE_INI);
 
 		await settings.write?.(context, {
@@ -432,7 +428,7 @@ describe("the file the game actually writes", () => {
 		expect(text()).toBe(PREAMBLE_INI.replace("XPMultiplier=1.000000", "XPMultiplier=3"));
 	});
 
-	test("the metadata line is never read back as a setting", async () => {
+	it("the metadata line is never read back as a setting", async () => {
 		const { context } = textHarness(PREAMBLE_INI);
 
 		expect(await settings.read(context)).not.toHaveProperty(";METADATA");
@@ -444,7 +440,7 @@ describe("the settings a start applies", () => {
 		await replayPendingSettings(context, await readArkStamp(context));
 	};
 
-	test("reports the two values that changed and neither of the defaults saved unchanged", async () => {
+	it("reports the two values that changed and neither of the defaults saved unchanged", async () => {
 		const { context, reported } = harness({
 			ini: {
 				[GAME_USER_SETTINGS_FILE]: {
@@ -479,7 +475,7 @@ describe("the settings a start applies", () => {
 		]);
 	});
 
-	test("reports nothing for a value changed and changed back before the start", async () => {
+	it("reports nothing for a value changed and changed back before the start", async () => {
 		const { context, reported } = harness({
 			running: true,
 		});
@@ -496,7 +492,7 @@ describe("the settings a start applies", () => {
 		expect(reported).toEqual([]);
 	});
 
-	test("compares two saves before one start with the value the game started with", async () => {
+	it("compares two saves before one start with the value the game started with", async () => {
 		const { context, reported } = harness({
 			running: true,
 		});
@@ -526,7 +522,7 @@ describe("the settings a start applies", () => {
 		expect((await readArkStamp(context)).settingsBaseline).toEqual({});
 	});
 
-	test("keeps only a flag for a join password, never its value or a digest", async () => {
+	it("keeps only a flag for a join password, never its value or a digest", async () => {
 		const { context, reported } = harness({
 			ini: {
 				[GAME_USER_SETTINGS_FILE]: {
@@ -564,7 +560,7 @@ describe("the settings a start applies", () => {
 		expect(JSON.stringify(reported)).not.toContain("new-join-password");
 	});
 
-	test("still reports a join password changed and changed back, the accepted limit of keeping no value", async () => {
+	it("still reports a join password changed and changed back, the accepted limit of keeping no value", async () => {
 		const { context, reported } = harness({
 			ini: {
 				[GAME_USER_SETTINGS_FILE]: {
@@ -593,7 +589,7 @@ describe("the settings a start applies", () => {
 		]);
 	});
 
-	test("reports nothing for a join password saved unchanged", async () => {
+	it("reports nothing for a join password saved unchanged", async () => {
 		const { context, reported } = harness({
 			ini: {
 				[GAME_USER_SETTINGS_FILE]: {
@@ -620,7 +616,7 @@ describe("the settings a start applies", () => {
 		expect(reported).toEqual([]);
 	});
 
-	test("reports nothing when nothing was parked", async () => {
+	it("reports nothing when nothing was parked", async () => {
 		const { context, reported } = harness({
 			running: true,
 		});

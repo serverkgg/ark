@@ -12,8 +12,6 @@ export interface ArkCommandInput {
 	exclusiveJoin: boolean;
 }
 
-// `?` is the separator of the launch string itself, so a session name carrying one
-// would split into an option the engine then reads as garbage.
 export const stripQuery = (value: string) => {
 	return value.replaceAll("?", "").replaceAll(/[\r\n]+/g, " ");
 };
@@ -22,11 +20,7 @@ export const sanitizeSessionName = (name: string) => {
 	return stripQuery(name).trim().slice(0, SESSION_NAME_MAX);
 };
 
-// No password ever rides the launch string: the engine echoes its whole command line
-// into ShooterGame.log, and the wrapper tails that log into the customer's console.
-// ServerPassword and ServerAdminPassword live in [ServerSettings] instead, written by
-// applyControlConfig and the settings module before every start.
-export const mapString = (input: ArkCommandInput) => {
+export const mapStringWithoutSecrets = (input: ArkCommandInput) => {
 	return [
 		input.map,
 		"listen",
@@ -38,7 +32,7 @@ export const mapString = (input: ArkCommandInput) => {
 
 export const startArgs = (input: ArkCommandInput): string[] => {
 	return [
-		mapString(input),
+		mapStringWithoutSecrets(input),
 		`-Port=${input.gamePort}`,
 		`-WinLiveMaxPlayers=${clampMaxPlayers(input.maxPlayers)}`,
 		...(input.mods.length === 0

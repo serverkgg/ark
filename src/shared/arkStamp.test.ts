@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import {
@@ -34,7 +34,7 @@ const stampContext = (stamp: object) => {
 };
 
 describe("normalizeStamp", () => {
-	test("carries a pending admin password and reads a missing one as null", () => {
+	it("carries a pending admin password and reads a missing one as null", () => {
 		expect(
 			normalizeStamp({
 				adminPassword: "live",
@@ -52,7 +52,7 @@ describe("normalizeStamp", () => {
 		).toBeNull();
 	});
 
-	test("reads an empty stamp as the shape the driver expects", () => {
+	it("reads an empty stamp as the shape the driver expects", () => {
 		expect(normalizeStamp(null)).toEqual({
 			adminPassword: "",
 			adminPasswordNext: null,
@@ -65,7 +65,7 @@ describe("normalizeStamp", () => {
 });
 
 describe("normalizePending", () => {
-	test("keeps a file, section and string values", () => {
+	it("keeps a file, section and string values", () => {
 		expect(
 			normalizePending({
 				"a.ini": {
@@ -83,7 +83,7 @@ describe("normalizePending", () => {
 		});
 	});
 
-	test("drops anything that is not a string value, and the sections it empties", () => {
+	it("drops anything that is not a string value, and the sections it empties", () => {
 		expect(
 			normalizePending({
 				"a.ini": {
@@ -95,7 +95,7 @@ describe("normalizePending", () => {
 		).toEqual({});
 	});
 
-	test("reads garbage as nothing pending", () => {
+	it("reads garbage as nothing pending", () => {
 		expect(normalizePending("nope")).toEqual({});
 		expect(normalizePending(null)).toEqual({});
 		expect(normalizePending([])).toEqual({});
@@ -103,7 +103,7 @@ describe("normalizePending", () => {
 });
 
 describe("promoteAdminPassword", () => {
-	test("moves the next password into place and clears it", async () => {
+	it("moves the next password into place and clears it", async () => {
 		const context = stampContext({
 			adminPassword: "live",
 			adminPasswordNext: "next",
@@ -116,7 +116,7 @@ describe("promoteAdminPassword", () => {
 		expect((await readArkStamp(context)).adminPassword).toBe("next");
 	});
 
-	test("leaves the live password alone when nothing was rotated", async () => {
+	it("leaves the live password alone when nothing was rotated", async () => {
 		const context = stampContext({
 			adminPassword: "live",
 		});
@@ -126,7 +126,7 @@ describe("promoteAdminPassword", () => {
 });
 
 describe("rotateAdminPassword", () => {
-	test("parks a new password without touching the one the process is running on", async () => {
+	it("parks a new password without touching the one the process is running on", async () => {
 		const context = stampContext({
 			adminPassword: "live",
 		});
@@ -142,7 +142,7 @@ describe("rotateAdminPassword", () => {
 });
 
 describe("patchArkStamp", () => {
-	test("keeps the keys it was not asked to change", async () => {
+	it("keeps the keys it was not asked to change", async () => {
 		const context = stampContext({
 			adminPassword: "live",
 			buildId: "1",

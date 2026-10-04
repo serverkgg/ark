@@ -23,7 +23,7 @@ export const live: Bridge.Actions = {
 			context.activity.report({
 				name: BridgeEventName.BroadcastSent,
 				text: {
-					ar: `تم إرسال إعلان للاعبين: «${excerpt}»`,
+					ar: `تم إرسال إعلان إلى اللاعبين: «${excerpt}»`,
 					en: `Sent an announcement to players: "${excerpt}"`,
 				},
 			});
@@ -38,7 +38,7 @@ export const live: Bridge.Actions = {
 				},
 				name: BridgeEventName.GameplayChanged,
 				text: {
-					ar: "تم مسح الديناصورات البرية، وبتتولد من جديد",
+					ar: "تم حذف الديناصورات البرية، وستظهر من جديد",
 					en: "Wiped the wild dinos, they respawn fresh",
 				},
 			});

@@ -18,8 +18,8 @@ import {
 const REFRESH_SECONDS = 60;
 
 const URL_INPUT: Bridge.Text = {
-	ar: "حط رقم المود بس، مو الرابط. الرقم هو Project ID اللي في صندوق About في صفحة المود على CurseForge.",
-	en: "Paste the mod id on its own, not the link. The id is the numeric Project ID in the About box on the mod's CurseForge page.",
+	ar: "ضع رقم المود فقط، وليس الرابط. الرقم هو Project ID الموجود في صندوق About في صفحة المود على CurseForge.",
+	en: "Paste the mod ID on its own, not the link. The ID is the numeric Project ID in the About box on the mod's CurseForge page.",
 };
 
 const LINK_CHARACTERS = /[/:?]/;
@@ -43,7 +43,7 @@ export const modOrderRow = (mod: ArkMod, index: number): ArkModOrderRow => {
 					en: "Enabled",
 				}
 			: {
-					ar: "مطفي",
+					ar: "موقوف",
 					en: "Disabled",
 				},
 		title: mod.title,
@@ -61,8 +61,6 @@ const move = async (context: Bridge.Context, projectId: string, offset: number) 
 	}
 };
 
-// The web catalog installs from search results only, so this table is the way in for a
-// mod the key cannot look up — and the only place the load order can be changed.
 export const modOrder: Bridge.Collection = {
 	kind: BridgeKind.Collection,
 	refreshSeconds: REFRESH_SECONDS,

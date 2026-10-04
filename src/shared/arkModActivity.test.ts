@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { findMod, modPosition } from "./arkModActivity";
 
@@ -25,7 +25,7 @@ const unreadable = () => {
 };
 
 describe("the lookups an activity entry is built from", () => {
-	test("never fail the action when the staged mods cannot be read", async () => {
+	it("never fail the action when the staged mods cannot be read", async () => {
 		const { context, warnings } = unreadable();
 
 		expect(await findMod(context, "111111")).toBeNull();

@@ -2,7 +2,7 @@ import { type Bridge, BridgeKind, BridgeUserError } from "@serverkgg/bridge";
 import { ANNOUNCE_MESSAGE_LENGTH, rconCommand, serverChatCommand } from "../shared";
 
 export const EMPTY_MESSAGE: Bridge.Text = {
-	ar: "اكتب الرسالة أول.",
+	ar: "اكتب الرسالة أولًا.",
 	en: "Write the message first.",
 };
 

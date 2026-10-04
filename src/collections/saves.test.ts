@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { OFFICIAL_MAPS, SAVED_ARKS_DIRECTORY, savedArkDirectory } from "../shared";
@@ -59,7 +59,7 @@ const harness = (options: { maps?: string[]; variables?: Record<string, string> 
 };
 
 describe("listing the saved worlds", () => {
-	test("names each map folder, its size and the one the server boots into", async () => {
+	it("names each map folder, its size and the one the server boots into", async () => {
 		const { context } = harness({
 			maps: [
 				"Ragnarok_WP",
@@ -92,7 +92,7 @@ describe("listing the saved worlds", () => {
 		]);
 	});
 
-	test("reads the folders with find rather than walking the whole volume", async () => {
+	it("reads the folders with find rather than walking the whole volume", async () => {
 		const { commands, context } = harness({
 			maps: [
 				"TheIsland_WP",
@@ -105,7 +105,7 @@ describe("listing the saved worlds", () => {
 		expect(commands.at(1)?.at(0)).toBe("du");
 	});
 
-	test("answers with nothing at all before the first save", async () => {
+	it("answers with nothing at all before the first save", async () => {
 		const { context } = harness({});
 
 		expect(await saves.list(context)).toEqual([]);
@@ -113,7 +113,7 @@ describe("listing the saved worlds", () => {
 });
 
 describe("wiping one map's world", () => {
-	test("removes exactly that map's folder", async () => {
+	it("removes exactly that map's folder", async () => {
 		const { context, removed } = harness({
 			maps: [
 				"TheIsland_WP",
@@ -133,7 +133,7 @@ describe("wiping one map's world", () => {
 		]);
 	});
 
-	test("refuses a row id that is a path rather than a folder name", async () => {
+	it("refuses a row id that is a path rather than a folder name", async () => {
 		const { context, removed } = harness({
 			maps: [
 				"TheIsland_WP",
@@ -155,7 +155,7 @@ describe("wiping one map's world", () => {
 });
 
 describe("the activity a wipe reports", () => {
-	test("names the wiped map's world", async () => {
+	it("names the wiped map's world", async () => {
 		const { context, reported } = harness({
 			maps: [
 				"ScorchedEarth_WP",
@@ -182,7 +182,7 @@ describe("the activity a wipe reports", () => {
 		]);
 	});
 
-	test("reports nothing when the wipe is refused", async () => {
+	it("reports nothing when the wipe is refused", async () => {
 		const { context, reported } = harness({
 			maps: [
 				"ScorchedEarth_WP",
@@ -204,7 +204,7 @@ describe("the activity a wipe reports", () => {
 });
 
 describe("worldWipedText", () => {
-	test("never puts an article in front of a map name, for every official map", () => {
+	it("never puts an article in front of a map name, for every official map", () => {
 		for (const map of OFFICIAL_MAPS) {
 			const text = worldWipedText(map.name);
 

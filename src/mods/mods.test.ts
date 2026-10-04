@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { CURSEFORGE_SECRET } from "@serverkgg/bridge/catalogs";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
@@ -90,7 +90,7 @@ const harness = (
 };
 
 describe("searching the catalog", () => {
-	test("says the catalog is off, in both languages, when the key is not set", async () => {
+	it("says the catalog is off, in both languages, when the key is not set", async () => {
 		const { context } = harness();
 		const page = await mods.search(context, QUERY);
 
@@ -109,7 +109,7 @@ describe("searching the catalog", () => {
 		]);
 	});
 
-	test("still offers the sorts, so the panel renders the section rather than an error", async () => {
+	it("still offers the sorts, so the panel renders the section rather than an error", async () => {
 		const { context } = harness();
 
 		expect((await mods.search(context, QUERY)).sorts.length).toBeGreaterThan(0);
@@ -117,14 +117,14 @@ describe("searching the catalog", () => {
 });
 
 describe("staging a mod", () => {
-	test("refuses anything that is not a mod id", async () => {
+	it("refuses anything that is not a mod id", async () => {
 		const { context } = harness();
 
 		await expect(mods.install(context, "https://www.curseforge.com/ark-survival-ascended/mods/x")).rejects.toThrow();
 		await expect(mods.install(context, "")).rejects.toThrow();
 	});
 
-	test("records the id alone when the key is not set, and says so in the log", async () => {
+	it("records the id alone when the key is not set, and says so in the log", async () => {
 		const { context } = harness();
 		const entry = await mods.install(context, "928437");
 
@@ -138,7 +138,7 @@ describe("staging a mod", () => {
 		expect((await readMods(context)).mods).toHaveLength(1);
 	});
 
-	test("degrades to the id when curseforge does not answer", async () => {
+	it("degrades to the id when curseforge does not answer", async () => {
 		const { context, warnings } = harness({
 			key: "a-key",
 		});
@@ -148,7 +148,7 @@ describe("staging a mod", () => {
 		expect(warnings).toContain("curseforge did not answer for this mod, staging it by its id alone");
 	});
 
-	test("keeps one entry per mod however many times it is staged", async () => {
+	it("keeps one entry per mod however many times it is staged", async () => {
 		const { context } = harness();
 
 		await mods.install(context, "928437");
@@ -157,7 +157,7 @@ describe("staging a mod", () => {
 		expect((await readMods(context)).mods).toHaveLength(1);
 	});
 
-	test("stops at the mod limit rather than writing a launch line the game refuses", async () => {
+	it("stops at the mod limit rather than writing a launch line the game refuses", async () => {
 		const { context } = harness({
 			mods: Array.from({
 				length: MOD_LIST_LIMIT,
@@ -174,7 +174,7 @@ describe("staging a mod", () => {
 });
 
 describe("listing what is staged", () => {
-	test("answers in the order the launch line will carry them", async () => {
+	it("answers in the order the launch line will carry them", async () => {
 		const { context } = harness({
 			mods: [
 				{
@@ -194,7 +194,7 @@ describe("listing what is staged", () => {
 		]);
 	});
 
-	test("points each entry at the mods root the server downloads into", async () => {
+	it("points each entry at the mods root the server downloads into", async () => {
 		const { context } = harness({
 			mods: [
 				{
@@ -209,7 +209,7 @@ describe("listing what is staged", () => {
 });
 
 describe("removing and toggling", () => {
-	test("drops the id from the list without touching a file on disk", async () => {
+	it("drops the id from the list without touching a file on disk", async () => {
 		const { context } = harness({
 			mods: [
 				{
@@ -224,7 +224,7 @@ describe("removing and toggling", () => {
 		expect((await readMods(context)).mods).toEqual([]);
 	});
 
-	test("parks a mod without forgetting it", async () => {
+	it("parks a mod without forgetting it", async () => {
 		const { context } = harness({
 			mods: [
 				{
@@ -241,7 +241,7 @@ describe("removing and toggling", () => {
 });
 
 describe("the activity the catalog reports", () => {
-	test("reports a staged mod as enabled and downloading on the next start, never as installed", async () => {
+	it("reports a staged mod as enabled and downloading on the next start, never as installed", async () => {
 		const { context, reported } = harness({
 			key: "curseforge-key-never-shown",
 		});
@@ -263,7 +263,7 @@ describe("the activity the catalog reports", () => {
 		expect(JSON.stringify(reported)).not.toContain("curseforge-key-never-shown");
 	});
 
-	test("names the staged title on removal and on a toggle", async () => {
+	it("names the staged title on removal and on a toggle", async () => {
 		const { context, reported } = harness({
 			mods: [
 				{

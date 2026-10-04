@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { INSTALL_STAMP_FILE } from "@serverkgg/bridge/install";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
@@ -89,7 +89,7 @@ const pendingContext = () => {
 };
 
 describe("mergePending", () => {
-	test("folds a second write into the same section rather than replacing it", () => {
+	it("folds a second write into the same section rather than replacing it", () => {
 		const first = mergePending({}, [
 			{
 				file: "a.ini",
@@ -120,7 +120,7 @@ describe("mergePending", () => {
 		});
 	});
 
-	test("lets a later write win on the same key", () => {
+	it("lets a later write win on the same key", () => {
 		const first = mergePending({}, [
 			{
 				file: "a.ini",
@@ -150,7 +150,7 @@ describe("mergePending", () => {
 		});
 	});
 
-	test("ignores an empty patch", () => {
+	it("ignores an empty patch", () => {
 		expect(
 			mergePending({}, [
 				{
@@ -182,7 +182,7 @@ describe("forgetPending", () => {
 		},
 	]);
 
-	test("drops only the keys that were just written, and leaves the rest parked", () => {
+	it("drops only the keys that were just written, and leaves the rest parked", () => {
 		expect(
 			forgetPending(parked, [
 				{
@@ -205,7 +205,7 @@ describe("forgetPending", () => {
 		});
 	});
 
-	test("drops the section once its last key is gone", () => {
+	it("drops the section once its last key is gone", () => {
 		expect(
 			forgetPending(parked, [
 				{
@@ -226,7 +226,7 @@ describe("forgetPending", () => {
 		});
 	});
 
-	test("leaves a key parked when another file happens to use the same name", () => {
+	it("leaves a key parked when another file happens to use the same name", () => {
 		expect(
 			forgetPending(parked, [
 				{
@@ -242,7 +242,7 @@ describe("forgetPending", () => {
 });
 
 describe("flattenPending and pendingCount", () => {
-	test("counts every key across every file", () => {
+	it("counts every key across every file", () => {
 		const pending = mergePending({}, [
 			{
 				file: "a.ini",
@@ -267,7 +267,7 @@ describe("flattenPending and pendingCount", () => {
 });
 
 describe("record then replay", () => {
-	test("parks a write while the server is up and lays it back before the next start", async () => {
+	it("parks a write while the server is up and lays it back before the next start", async () => {
 		const { context, merged } = pendingContext();
 
 		await recordPendingSettings(context, [
@@ -296,7 +296,7 @@ describe("record then replay", () => {
 		expect((await readArkStamp(context)).settingsPending).toEqual({});
 	});
 
-	test("writes nothing when there is nothing parked", async () => {
+	it("writes nothing when there is nothing parked", async () => {
 		const { context, merged } = pendingContext();
 
 		await replayPendingSettings(context, await readArkStamp(context));
@@ -306,7 +306,7 @@ describe("record then replay", () => {
 });
 
 describe("the activity a replay reports", () => {
-	test("reports every pending key of a stamp written before the baseline existed, and still starts", async () => {
+	it("reports every pending key of a stamp written before the baseline existed, and still starts", async () => {
 		const { context, merged, reported } = pendingContext();
 
 		await context.files.write(
@@ -344,7 +344,7 @@ describe("the activity a replay reports", () => {
 		});
 	});
 
-	test("reports nothing when the cleared stamp cannot be written", async () => {
+	it("reports nothing when the cleared stamp cannot be written", async () => {
 		const { context, reported } = pendingContext();
 
 		await recordPendingSettings(context, [
@@ -368,7 +368,7 @@ describe("the activity a replay reports", () => {
 		expect(reported).toEqual([]);
 	});
 
-	test("reports nothing when there is nothing parked", async () => {
+	it("reports nothing when there is nothing parked", async () => {
 		const { context, reported } = pendingContext();
 
 		await replayPendingSettings(context, await readArkStamp(context));
@@ -388,7 +388,7 @@ describe("the baseline a pending write keeps", () => {
 		];
 	};
 
-	test("keeps the first baseline of a key that is already pending", () => {
+	it("keeps the first baseline of a key that is already pending", () => {
 		const first = mergeBaseline(
 			{},
 			{},
@@ -426,7 +426,7 @@ describe("the baseline a pending write keeps", () => {
 		});
 	});
 
-	test("keeps only whether a secret differed, never its value or a digest", () => {
+	it("keeps only whether a secret differed, never its value or a digest", () => {
 		const entry = secretBaseline("old-join-password", "new-join-password");
 
 		expect(entry).toEqual({
@@ -452,7 +452,7 @@ describe("the baseline a pending write keeps", () => {
 		]);
 	});
 
-	test("lets a later save turn a secret's flag on but never off", () => {
+	it("lets a later save turn a secret's flag on but never off", () => {
 		const pending = mergePending(
 			{},
 			patch({
@@ -492,7 +492,7 @@ describe("the baseline a pending write keeps", () => {
 		).toEqual(changed);
 	});
 
-	test("reads a digest left by an earlier build as changed, never as an error", async () => {
+	it("reads a digest left by an earlier build as changed, never as an error", async () => {
 		const { context, reported } = pendingContext();
 
 		await context.files.write(
@@ -531,7 +531,7 @@ describe("the baseline a pending write keeps", () => {
 		]);
 	});
 
-	test("compares a plain baseline the way the bridge compares settings", () => {
+	it("compares a plain baseline the way the bridge compares settings", () => {
 		expect(
 			changedPendingKeys(
 				mergePending(
@@ -561,18 +561,18 @@ describe("the baseline a pending write keeps", () => {
 });
 
 describe("the bridge comparison the replay report relies on", () => {
-	test("reads a number the game padded as the number it is", () => {
+	it("reads a number the game padded as the number it is", () => {
 		expect(sameSettingValue("1", "1.000000")).toBe(true);
 		expect(sameSettingValue("2.5", "2.500000")).toBe(true);
 		expect(sameSettingValue("1", "2.000000")).toBe(false);
 	});
 
-	test("reads a boolean in any case as the same boolean", () => {
+	it("reads a boolean in any case as the same boolean", () => {
 		expect(sameSettingValue("True", "true")).toBe(true);
 		expect(sameSettingValue("False", "true")).toBe(false);
 	});
 
-	test("takes only plain decimals as numbers, so an exponent is different text", () => {
+	it("takes only plain decimals as numbers, so an exponent is different text", () => {
 		expect(sameSettingValue("1e3", "1000")).toBe(false);
 		expect(sameSettingValue(" My Tribe ", "My Tribe")).toBe(true);
 		expect(sameSettingValue(undefined, "")).toBe(true);
@@ -581,7 +581,7 @@ describe("the bridge comparison the replay report relies on", () => {
 });
 
 describe("forgetPendingSettings", () => {
-	test("drops the parked copy of a key that was written while the server was down", async () => {
+	it("drops the parked copy of a key that was written while the server was down", async () => {
 		const { context } = pendingContext();
 
 		await recordPendingSettings(context, [

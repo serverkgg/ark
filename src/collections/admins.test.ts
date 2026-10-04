@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { ADMIN_LIST_FILE } from "../shared";
@@ -53,7 +53,7 @@ const harness = (listed?: string[]) => {
 };
 
 describe("the admin list", () => {
-	test("reads one account per line out of the file the game loads at boot", async () => {
+	it("reads one account per line out of the file the game loads at boot", async () => {
 		const { context } = harness([
 			FIRST,
 			SECOND,
@@ -71,13 +71,13 @@ describe("the admin list", () => {
 		]);
 	});
 
-	test("answers with nothing at all before the file exists", async () => {
+	it("answers with nothing at all before the file exists", async () => {
 		const { context } = harness();
 
 		expect(await admins.list(context)).toEqual([]);
 	});
 
-	test("adds an account without asking the running server, because the file is the whole mechanism", async () => {
+	it("adds an account without asking the running server, because the file is the whole mechanism", async () => {
 		const { context, file } = harness();
 
 		await admins.add?.(context, FIRST.toUpperCase());
@@ -85,7 +85,7 @@ describe("the admin list", () => {
 		expect(file()).toBe(`${FIRST}\n`);
 	});
 
-	test("never lists the same account twice", async () => {
+	it("never lists the same account twice", async () => {
 		const { context, file } = harness([
 			FIRST,
 		]);
@@ -95,7 +95,7 @@ describe("the admin list", () => {
 		expect(file()).toBe(`${FIRST}\n`);
 	});
 
-	test("drops one account and leaves the rest", async () => {
+	it("drops one account and leaves the rest", async () => {
 		const { context, file } = harness([
 			FIRST,
 			SECOND,
@@ -113,7 +113,7 @@ describe("the admin list", () => {
 		expect(file()).toBe(`${SECOND}\n`);
 	});
 
-	test("refuses anything that is not an account id", async () => {
+	it("refuses anything that is not an account id", async () => {
 		const { context } = harness();
 
 		await expect(admins.add?.(context, "our friend")).rejects.toThrow();
@@ -121,7 +121,7 @@ describe("the admin list", () => {
 });
 
 describe("the activity the admins list reports", () => {
-	test("grants access to the account it added", async () => {
+	it("grants access to the account it added", async () => {
 		const { context, reported } = harness();
 
 		await admins.add?.(context, FIRST);
@@ -138,7 +138,7 @@ describe("the activity the admins list reports", () => {
 		]);
 	});
 
-	test("revokes access from the account it removed", async () => {
+	it("revokes access from the account it removed", async () => {
 		const { context, reported } = harness([
 			FIRST,
 		]);

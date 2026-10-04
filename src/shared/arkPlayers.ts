@@ -1,11 +1,8 @@
 import type { Bridge } from "@serverkgg/bridge";
 
-// ListPlayers answers one line per player as `<n>. <name>, <eos id>`, and a bare
-// "No Players Connected" while the map is empty. The keep-alive frames ARK pushes on
-// its own land in the same reply, so anything that is not a numbered row is dropped.
 const PLAYER_LINE = /^\d+\.\s*(?<name>.+?),\s*(?<eosId>[0-9a-f]{32})\s*$/i;
 
-const NOISE = /^(?:no players connected|keep alive)\.?$/i;
+const EMPTY_ROSTER_OR_KEEP_ALIVE_LINE = /^(?:no players connected|keep alive)\.?$/i;
 
 export interface ArkPlayer {
 	name: string;
@@ -25,7 +22,7 @@ export const parseListPlayers = (reply: string): ArkPlayer[] => {
 	for (const raw of reply.split("\n")) {
 		const line = raw.trim();
 
-		if (line.length === 0 || NOISE.test(line)) {
+		if (line.length === 0 || EMPTY_ROSTER_OR_KEEP_ALIVE_LINE.test(line)) {
 			continue;
 		}
 

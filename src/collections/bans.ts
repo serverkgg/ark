@@ -26,9 +26,6 @@ export const banRow = (eosId: string): ArkBanRow => {
 	};
 };
 
-// A running server owns BanList.txt: BanPlayer and UnbanPlayer make it rewrite the whole
-// file from memory, so a mirror written beside it is thrown away. The panel drives rcon
-// while the game is up and edits the file only while it is down.
 export const bans: Bridge.Collection = {
 	kind: BridgeKind.Collection,
 	refreshSeconds: REFRESH_SECONDS,

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { GAME_USER_SETTINGS_FILE, RCON_PORT, SERVER_SETTINGS_SECTION, SESSION_SETTINGS_SECTION } from "../shared";
 import { defaultSessionName, seedConfig } from "./seedConfig";
@@ -61,13 +61,13 @@ const iniContext = (initial: Record<string, Record<string, Bridge.Values>> = {})
 };
 
 describe("defaultSessionName", () => {
-	test("names a fresh server after the platform and its own code", () => {
+	it("names a fresh server after the platform and its own code", () => {
 		expect(defaultSessionName("abc123")).toBe("Serverk ARK abc123");
 	});
 });
 
 describe("seedConfig", () => {
-	test("writes the control channel the driver dials on loopback", async () => {
+	it("writes the control channel the driver dials on loopback", async () => {
 		const { context, section } = iniContext();
 
 		await seedConfig(context, "adminpass");
@@ -79,7 +79,7 @@ describe("seedConfig", () => {
 		});
 	});
 
-	test("names the server and leaves the join password as an empty key to write into", async () => {
+	it("names the server and leaves the join password as an empty key to write into", async () => {
 		const { context, section } = iniContext();
 
 		await seedConfig(context, "adminpass");
@@ -88,7 +88,7 @@ describe("seedConfig", () => {
 		expect(section(SERVER_SETTINGS_SECTION).ServerPassword).toBe("");
 	});
 
-	test("keeps a name and a join password the customer already set", async () => {
+	it("keeps a name and a join password the customer already set", async () => {
 		const { context, section } = iniContext({
 			[GAME_USER_SETTINGS_FILE]: {
 				[SERVER_SETTINGS_SECTION]: {
@@ -106,7 +106,7 @@ describe("seedConfig", () => {
 		expect(section(SERVER_SETTINGS_SECTION).ServerPassword).toBe("letmein");
 	});
 
-	test("re-merges the control keys over whatever the game wrote on its way out", async () => {
+	it("re-merges the control keys over whatever the game wrote on its way out", async () => {
 		const { context, section } = iniContext({
 			[GAME_USER_SETTINGS_FILE]: {
 				[SERVER_SETTINGS_SECTION]: {

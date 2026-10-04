@@ -24,9 +24,6 @@ export interface ArkStamp {
 	buildId: string | null;
 	adminPassword: string;
 	adminPasswordNext: string | null;
-	// ARK rewrites GameUserSettings.ini from memory when it exits, so a panel write made
-	// while the server is up is also parked here and laid back over the file before the
-	// next start. Without the replay the write is silently thrown away.
 	settingsPending: ArkPendingSettings;
 	settingsBaseline: ArkSettingsBaseline;
 	launch: Record<string, string>;
@@ -197,7 +194,7 @@ export const reportAdminPasswordRotated = (context: Bridge.Context, target: stri
 		},
 		name: BridgeEventName.SecretRotated,
 		text: {
-			ar: "تم تغيير كلمة مرور الأدمن وكلمة مرور RCON معها، والتغيير ينطبق مع التشغيل الجاي",
+			ar: "تم تغيير كلمة مرور الأدمن وكلمة مرور RCON معها، ويُطبَّق التغيير في التشغيل القادم",
 			en: "Changed the admin password and the RCON password with it, takes effect on the next start",
 		},
 	});

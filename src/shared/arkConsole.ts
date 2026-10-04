@@ -23,8 +23,6 @@ export const sanitizeCommand = (input: string) => {
 		.slice(0, CONSOLE_COMMAND_MAX);
 };
 
-// ARK's own console takes `cheat <command>`; over rcon the prefix is already implied
-// and a doubled one answers with nothing at all.
 export const stripCheatPrefix = (input: string) => {
 	return input.replace(CHEAT_PREFIX, "").trim();
 };

@@ -28,7 +28,7 @@ const arabicHours = (hours: number) => {
 };
 
 const arabicMinutes = (minutes: number) => {
-	return arabicCount(minutes, "دقيقة", "دقيقتين", "دقايق", "دقيقة");
+	return arabicCount(minutes, "دقيقة", "دقيقتين", "دقائق", "دقيقة");
 };
 
 export const formatUptime = (seconds: number): Bridge.Text => {
@@ -67,14 +67,14 @@ export const crossplayBadge = (crossplay: boolean): Bridge.DetailBadge => {
 	return crossplay
 		? {
 				label: {
-					ar: "كروس بلاي مفتوح",
+					ar: "الكروس بلاي مفعّل",
 					en: "Crossplay on",
 				},
 				tone: BridgeDetailTone.Success,
 			}
 		: {
 				label: {
-					ar: "PC بس",
+					ar: "PC فقط",
 					en: "PC only",
 				},
 				tone: BridgeDetailTone.Neutral,
@@ -85,14 +85,14 @@ export const battleyeBadge = (battleye: boolean): Bridge.DetailBadge => {
 	return battleye
 		? {
 				label: {
-					ar: "BattlEye شغّال",
+					ar: "BattlEye مفعّل",
 					en: "BattlEye on",
 				},
 				tone: BridgeDetailTone.Warning,
 			}
 		: {
 				label: {
-					ar: "BattlEye مطفي",
+					ar: "BattlEye موقوف",
 					en: "BattlEye off",
 				},
 				tone: BridgeDetailTone.Neutral,
@@ -125,7 +125,7 @@ export const metrics: Bridge.Detail = {
 					format: BridgeDetailFormat.Text,
 					key: "players",
 					label: {
-						ar: "اللاعبين",
+						ar: "اللاعبون",
 						en: "Players",
 					},
 					value: snapshot.players === null ? MISSING : `${snapshot.players}/${variables.maxPlayers}`,
@@ -152,7 +152,7 @@ export const metrics: Bridge.Detail = {
 					format: BridgeDetailFormat.Text,
 					key: "build",
 					label: {
-						ar: "نسخة اللعبة",
+						ar: "بيلد اللعبة",
 						en: "Game build",
 					},
 					value: stamp.buildId ?? MISSING,
@@ -161,7 +161,7 @@ export const metrics: Bridge.Detail = {
 					format: BridgeDetailFormat.Text,
 					key: "uptime",
 					label: {
-						ar: "شغّال من",
+						ar: "مدة التشغيل",
 						en: "Up for",
 					},
 					value: snapshot.uptimeSeconds === null ? MISSING : formatUptime(snapshot.uptimeSeconds),
@@ -177,7 +177,7 @@ export const metrics: Bridge.Detail = {
 				},
 			],
 			subtitle: {
-				ar: "الأرقام هذي طالعة من سيرفرك نفسه، مو تقدير.",
+				ar: "هذه الأرقام صادرة من سيرفرك مباشرة، وليست تقديرًا.",
 				en: "These numbers come straight from your own server, not an estimate.",
 			},
 			title: {

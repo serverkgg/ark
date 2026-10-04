@@ -11,8 +11,8 @@ export const CURSEFORGE_PROVIDER = "curseforge";
 const CATEGORY_HIERARCHY = /\s*\\\s*/g;
 
 export const NOT_READY_NOTE: Bridge.Text = {
-	ar: "كتالوج المودات مقفل الحين لأن مفتاح CurseForge ناقص. لسا تقدر تضيف أي مود برقمه من جدول الترتيب تحت.",
-	en: "The mod catalog is off right now because the CurseForge key is missing. You can still add any mod by its id from the order table below.",
+	ar: "كتالوج المودات غير متاح الآن لأن مفتاح CurseForge غير موجود. وما زال بإمكانك إضافة أي مود برقمه من جدول الترتيب في الأسفل.",
+	en: "The mod catalog is off right now because the CurseForge key is missing. You can still add any mod by its ID from the order table below.",
 };
 
 export const CURSEFORGE_LABEL: Bridge.Text = {

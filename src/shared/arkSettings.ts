@@ -107,8 +107,8 @@ const multiplier = (spec: Omit<ArkSettingSpec, "fallback" | "kind" | "min" | "st
 export const SERVER_SETTINGS_GROUP = grouped(ArkSettingGroup.Server, [
 	inSessionSettings({
 		help: {
-			ar: "الاسم اللي يشوفونه اللاعبين في قائمة Unofficial. علامة الاستفهام تكسر سطر التشغيل، فما نقبلها.",
-			en: "The name players see under Unofficial. A question mark breaks the launch line, so it is not allowed.",
+			ar: "الاسم الذي يراه اللاعبون في قائمة Unofficial. علامة الاستفهام تُفسد سطر التشغيل، فلا نقبلها.",
+			en: "The name players see under Unofficial. A question mark breaks the launch line, so it isn't allowed.",
 		},
 		key: "SessionName",
 		kind: ArkSettingKind.Text,
@@ -119,15 +119,15 @@ export const SERVER_SETTINGS_GROUP = grouped(ArkSettingGroup.Server, [
 		maxLength: SESSION_NAME_MAX,
 		pattern: SESSION_NAME_PATTERN,
 		patternHint: {
-			ar: "اكتب اسم مو فاضي وما فيه علامة استفهام.",
-			en: "Write a name that is not empty and has no question mark in it.",
+			ar: "اكتب اسمًا غير فارغ، ودون علامة استفهام.",
+			en: "Write a name that isn't empty and has no question mark in it.",
 		},
 		fallback: "",
 	}),
 	inServerSettings({
 		fallback: "",
 		help: {
-			ar: "خلها فاضية عشان سيرفرك يكون مفتوح للكل.",
+			ar: "اتركها فارغة ليكون سيرفرك مفتوحًا للجميع.",
 			en: "Leave it empty to keep your server open to everyone.",
 		},
 		key: "ServerPassword",
@@ -141,7 +141,7 @@ export const SERVER_SETTINGS_GROUP = grouped(ArkSettingGroup.Server, [
 	inMessageOfTheDay({
 		fallback: "",
 		help: {
-			ar: "تطلع لكل لاعب أول ما يدخل سيرفرك.",
+			ar: "تظهر لكل لاعب بمجرد دخوله سيرفرك.",
 			en: "Shown to every player the moment they join.",
 		},
 		key: "Message",
@@ -155,8 +155,8 @@ export const SERVER_SETTINGS_GROUP = grouped(ArkSettingGroup.Server, [
 	inMessageOfTheDay({
 		fallback: "20",
 		help: {
-			ar: "بالثواني — كم تجلس الرسالة على شاشة اللاعب.",
-			en: "In seconds — how long the message sits on the player's screen.",
+			ar: "بالثواني: مدة بقاء الرسالة على شاشة اللاعب.",
+			en: "In seconds: how long the message stays on the player's screen.",
 		},
 		key: "Duration",
 		kind: ArkSettingKind.Number,
@@ -171,13 +171,13 @@ export const SERVER_SETTINGS_GROUP = grouped(ArkSettingGroup.Server, [
 	inServerSettings({
 		fallback: "3600",
 		help: {
-			ar: "بالثواني. اللاعب اللي ما تحرك هالمدة يطلع لحاله. 0 يوقف الطرد.",
-			en: "In seconds. A player who has not moved for that long is dropped. 0 turns it off.",
+			ar: "بالثواني. اللاعب الذي لا يتحرك طوال هذه المدة يُطرد تلقائيًا. 0 يوقف الطرد.",
+			en: "In seconds. A player who hasn't moved for that long is dropped. 0 turns it off.",
 		},
 		key: "KickIdlePlayersPeriod",
 		kind: ArkSettingKind.Number,
 		label: {
-			ar: "طرد الواقف بلا حركة",
+			ar: "طرد اللاعب الخامل",
 			en: "Kick idle players after",
 		},
 		max: 86_400,
@@ -187,8 +187,8 @@ export const SERVER_SETTINGS_GROUP = grouped(ArkSettingGroup.Server, [
 	inServerSettings({
 		fallback: "15",
 		help: {
-			ar: "بالدقايق. كل ما قرّبته صار عالمك أأمن، بس تحس بتقطيع بسيط كل حفظة.",
-			en: "In minutes. Shorter keeps your world safer, at the cost of a small stutter on every save.",
+			ar: "بالدقائق. كلما قصّرت المدة كانت مابك أكثر أمانًا، لكن يحدث تقطيع بسيط مع كل حفظ.",
+			en: "In minutes. Shorter keeps your map safer, at the cost of a small stutter on every save.",
 		},
 		key: "AutoSavePeriodMinutes",
 		kind: ArkSettingKind.Number,
@@ -239,7 +239,7 @@ export const SERVER_SETTINGS_GROUP = grouped(ArkSettingGroup.Server, [
 	inServerSettings({
 		fallback: "True",
 		help: {
-			ar: "يبيّن مكان اللاعب على المابين الكبيرة والصغيرة.",
+			ar: "يوضح مكان اللاعب على الماب والميني ماب.",
 			en: "Shows the player where they are on the map and the minimap.",
 		},
 		key: "ShowMapPlayerLocation",
@@ -252,8 +252,8 @@ export const SERVER_SETTINGS_GROUP = grouped(ArkSettingGroup.Server, [
 	inServerSettings({
 		fallback: "False",
 		help: {
-			ar: "يشيل الواجهة كلها عن اللاعبين — للسيرفرات اللي تبي جو واقعي.",
-			en: "Strips the whole HUD from your players — for servers that want it raw.",
+			ar: "يخفي الواجهة كلها عن اللاعبين، للسيرفرات التي تريد تجربة واقعية.",
+			en: "Strips the whole HUD from your players, for servers that want a realistic feel.",
 		},
 		key: "ServerForceNoHUD",
 		kind: ArkSettingKind.Boolean,
@@ -268,8 +268,8 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 	inServerSettings({
 		fallback: "False",
 		help: {
-			ar: "من هنا تقرر شكل سيرفرك: القتال، الغارات، والبناء. مع PVE ما يقدر اللاعبين يضربون بعض.",
-			en: "This is where you shape your server: combat, raiding and building. With PVE on, players cannot hurt each other.",
+			ar: "من هنا تحدد طبيعة سيرفرك: القتال، والغارات، والبناء. وفي وضع PVE لا يستطيع اللاعبون إيذاء بعضهم.",
+			en: "This is where you shape your server: combat, raiding and building. With PVE on, players can't hurt each other.",
 		},
 		key: "ServerPVE",
 		kind: ArkSettingKind.Boolean,
@@ -281,13 +281,13 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 	inServerSettings({
 		fallback: "False",
 		help: {
-			ar: "قاعدة اللاعب ما تنهجم وهو مو داخل.",
-			en: "A player's base cannot be raided while they are offline.",
+			ar: "لا يمكن مهاجمة قاعدة اللاعب وهو غير متصل.",
+			en: "A player's base can't be raided while they're offline.",
 		},
 		key: "PreventOfflinePvP",
 		kind: ArkSettingKind.Boolean,
 		label: {
-			ar: "حماية اللي مو داخل",
+			ar: "حماية اللاعبين غير المتصلين",
 			en: "Offline raid protection",
 		},
 	}),
@@ -300,20 +300,20 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 			en: "Hardcore",
 		},
 		warning: {
-			ar: "في الهاردكور، موت اللاعب يرجّعه للمستوى 1 من جديد.",
+			ar: "في الهاردكور، يعيد الموت اللاعب إلى المستوى 1 من جديد.",
 			en: "In hardcore, death sends the player all the way back to level 1.",
 		},
 	}),
 	inServerSettings({
 		fallback: "False",
 		help: {
-			ar: "يخلي الديناصورات الطيّارة تشيل اللاعبين والديناصورات في سيرفر PVE.",
+			ar: "يسمح للديناصورات الطائرة بحمل اللاعبين والديناصورات في سيرفر PVE.",
 			en: "Lets flyers pick up players and dinos on a PVE server.",
 		},
 		key: "AllowFlyerCarryPvE",
 		kind: ArkSettingKind.Boolean,
 		label: {
-			ar: "الديناصورات الطيّارة تشيل في PVE",
+			ar: "حمل الديناصورات الطائرة في PVE",
 			en: "Flyers carry in PVE",
 		},
 	}),
@@ -329,7 +329,7 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 	inServerSettings({
 		fallback: "False",
 		help: {
-			ar: "يخلي التيتانوصور وأمثاله يبقى معك بعد الترويض بدل ما يروح.",
+			ar: "يُبقي التيتانوصور وأمثاله معك بعد الترويض بدلًا من رحيله.",
 			en: "Lets a Titanosaur and its kind stay with you after taming instead of walking off.",
 		},
 		key: "AllowRaidDinoFeeding",
@@ -342,7 +342,7 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 	inServerSettings({
 		fallback: "False",
 		help: {
-			ar: "مبانيك تبقى مكانها حتى لو ما دخلت مدة طويلة.",
+			ar: "تبقى مبانيك في مكانها حتى إذا غبت مدة طويلة.",
 			en: "Your builds stay put even after a long time away.",
 		},
 		key: "DisableStructureDecayPvE",
@@ -355,7 +355,7 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 	inServerSettings(
 		multiplier({
 			help: {
-				ar: "كل ما نقّصته، تهالكت المباني المتروكة أسرع.",
+				ar: "كلما خفّضته، تهالكت المباني المتروكة أسرع.",
 				en: "Lower it and abandoned builds fall apart sooner.",
 			},
 			key: "PvEStructureDecayPeriodMultiplier",
@@ -377,7 +377,7 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 		min: 100,
 		step: 100,
 		warning: {
-			ar: "كل ما كبّرت الرقم، زاد اللي تاكله الرام وصار اللاق أقرب.",
+			ar: "كلما زاد الرقم، زاد استهلاك الرام واقترب ظهور اللاق.",
 			en: "A bigger number eats more memory and brings lag closer.",
 		},
 	}),
@@ -393,14 +393,14 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 		min: 50,
 		step: 50,
 		warning: {
-			ar: "كل ما كبّرت الرقم، زاد اللي تاكله الرام وصار اللاق أقرب.",
+			ar: "كلما زاد الرقم، زاد استهلاك الرام واقترب ظهور اللاق.",
 			en: "A bigger number eats more memory and brings lag closer.",
 		},
 	}),
 	inServerSettings({
 		fallback: "False",
 		help: {
-			ar: "يمنع ديناصور واحد من كنس موارد الماب بضربة وحدة.",
+			ar: "يمنع الديناصور الواحد من جمع موارد الماب كلها بضربة واحدة.",
 			en: "Stops one dino from clearing the map's resources in a single hit.",
 		},
 		key: "ClampResourceHarvestDamage",
@@ -413,8 +413,8 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 	inGameMode({
 		fallback: "False",
 		help: {
-			ar: "أعضاء القبيلة ما يأذون بعض في سيرفر PVE.",
-			en: "Tribe members cannot hurt each other on a PVE server.",
+			ar: "لا يؤذي أعضاء القبيلة بعضهم في سيرفر PVE.",
+			en: "Tribe members can't hurt each other on a PVE server.",
 		},
 		key: "bPvEDisableFriendlyFire",
 		kind: ArkSettingKind.Boolean,
@@ -426,7 +426,7 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 	inGameMode({
 		fallback: "False",
 		help: {
-			ar: "يخلي المباني تنحط فوق الصخور والأرض المايلة بدون ما ترفض.",
+			ar: "يسمح بوضع المباني فوق الصخور والأرض المائلة دون رفضها.",
 			en: "Lets structures snap onto rocks and uneven ground instead of being refused.",
 		},
 		key: "bDisableStructurePlacementCollision",
@@ -439,7 +439,7 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 	inGameMode({
 		fallback: "False",
 		help: {
-			ar: "اللاعب يعيد توزيع نقاطه كم ما يبي.",
+			ar: "يعيد اللاعب توزيع نقاطه كلما أراد.",
 			en: "A player can redistribute their stat points as often as they like.",
 		},
 		key: "bAllowUnlimitedRespecs",
@@ -452,7 +452,7 @@ export const RULES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rules, [
 	inGameMode({
 		fallback: "0",
 		help: {
-			ar: "0 يعني بدون حد.",
+			ar: "0 يعني بلا حد.",
 			en: "0 means no limit.",
 		},
 		key: "MaxNumberOfPlayersInTribe",
@@ -471,7 +471,7 @@ export const RATES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rates, [
 	inServerSettings({
 		fallback: "1.0",
 		help: {
-			ar: "هو والصعوبة الرسمية تحت يقررون أعلى مستوى تطلع فيه الديناصورات البرية.",
+			ar: "يحدد مع الصعوبة الرسمية في الأسفل أعلى مستوى تظهر به الديناصورات البرية.",
 			en: "Together with the official difficulty below, this decides how high wild dinos spawn.",
 		},
 		key: "DifficultyOffset",
@@ -487,7 +487,7 @@ export const RATES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rates, [
 	inServerSettings({
 		fallback: "5.0",
 		help: {
-			ar: "5 يعطيك ديناصورات إلى المستوى 150، و10 إلى 300.",
+			ar: "القيمة 5 تعطيك ديناصورات حتى المستوى 150، والقيمة 10 حتى 300.",
 			en: "5 gives you wild dinos up to level 150, 10 up to level 300.",
 		},
 		key: "OverrideOfficialDifficulty",
@@ -503,7 +503,7 @@ export const RATES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rates, [
 	inServerSettings(
 		multiplier({
 			help: {
-				ar: "كل المضاعفات هنا تقرأ بنفس الطريقة: 1 هو الطبيعي، وكل ما كبّرت الرقم صار الشي أسرع أو أكثر.",
+				ar: "تُقرأ كل المضاعفات هنا بالطريقة نفسها: 1 هو الوضع الطبيعي، وكلما زاد الرقم كان الشيء أسرع أو أكثر.",
 				en: "Every multiplier here reads the same way: 1 is normal, and a bigger number means faster or more.",
 			},
 			key: "XPMultiplier",
@@ -534,12 +534,12 @@ export const RATES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rates, [
 	inServerSettings(
 		multiplier({
 			help: {
-				ar: "كل ما نقّصته، رجعت الأشجار والصخور أسرع.",
+				ar: "كلما خفّضته، عادت الأشجار والصخور أسرع.",
 				en: "Lower it and the trees and rocks come back faster.",
 			},
 			key: "ResourcesRespawnPeriodMultiplier",
 			label: {
-				ar: "رجوع الموارد",
+				ar: "عودة ظهور الموارد",
 				en: "Resource respawn",
 			},
 		}),
@@ -556,7 +556,7 @@ export const RATES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rates, [
 	inServerSettings(
 		multiplier({
 			help: {
-				ar: "كل ما كبّرته، قصر النهار.",
+				ar: "كلما زاد، قصر النهار.",
 				en: "Higher makes the day shorter.",
 			},
 			key: "DayTimeSpeedScale",
@@ -569,7 +569,7 @@ export const RATES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rates, [
 	inServerSettings(
 		multiplier({
 			help: {
-				ar: "كل ما كبّرته، قصر الليل.",
+				ar: "كلما زاد، قصر الليل.",
 				en: "Higher makes the night shorter.",
 			},
 			key: "NightTimeSpeedScale",
@@ -609,7 +609,7 @@ export const RATES_SETTINGS_GROUP = grouped(ArkSettingGroup.Rates, [
 	inServerSettings(
 		multiplier({
 			help: {
-				ar: "كل ما كبّرته، قل الضرر اللي ياخذه اللاعب.",
+				ar: "كلما زاد، قلّ الضرر الذي يتلقاه اللاعب.",
 				en: "The bigger it is, the less damage the player takes.",
 			},
 			key: "PlayerResistanceMultiplier",
@@ -661,7 +661,7 @@ export const BREEDING_SETTINGS_GROUP = grouped(ArkSettingGroup.Breeding, [
 	inGameMode(
 		multiplier({
 			help: {
-				ar: "كل ما نقّصته، قدر الديناصور يتزاوج مرة ثانية أسرع.",
+				ar: "كلما خفّضته، استطاع الديناصور التزاوج من جديد أسرع.",
 				en: "Lower it and a dino can mate again sooner.",
 			},
 			key: "MatingIntervalMultiplier",
@@ -684,7 +684,7 @@ export const BREEDING_SETTINGS_GROUP = grouped(ArkSettingGroup.Breeding, [
 		multiplier({
 			key: "BabyMatureSpeedMultiplier",
 			label: {
-				ar: "سرعة كبر الصغار",
+				ar: "سرعة نمو الصغار",
 				en: "Baby maturation speed",
 			},
 		}),
@@ -692,8 +692,8 @@ export const BREEDING_SETTINGS_GROUP = grouped(ArkSettingGroup.Breeding, [
 	inGameMode(
 		multiplier({
 			help: {
-				ar: "كل ما نقّصته، طلب الصغير تدليل أكثر — وكل ما كبّرته ارتحت.",
-				en: "Lower it and the baby asks to be cuddled more often; higher and you get a break.",
+				ar: "كلما خفّضته، طلب الصغير التدليل أكثر، وكلما زاد خفّ عليك ذلك.",
+				en: "Lower it and the baby asks to be cuddled more often. Raise it and you get a break.",
 			},
 			key: "BabyCuddleIntervalMultiplier",
 			label: {
@@ -717,7 +717,7 @@ export const CHAT_SETTINGS_GROUP = grouped(ArkSettingGroup.Chat, [
 	inServerSettings({
 		fallback: "False",
 		help: {
-			ar: "صوتك يوصل كل من في السيرفر، مو بس اللي جنبك.",
+			ar: "يصل صوتك إلى كل من في السيرفر، وليس إلى القريبين منك فقط.",
 			en: "Your voice reaches everyone on the server, not just whoever is standing next to you.",
 		},
 		key: "GlobalVoiceChat",
@@ -730,7 +730,7 @@ export const CHAT_SETTINGS_GROUP = grouped(ArkSettingGroup.Chat, [
 	inServerSettings({
 		fallback: "False",
 		help: {
-			ar: "الكتابة توصل بس للي قريبين منك في الماب.",
+			ar: "تصل الرسائل المكتوبة فقط إلى القريبين منك في الماب.",
 			en: "Typed chat reaches only the players close to you on the map.",
 		},
 		key: "ProximityChat",
@@ -922,8 +922,8 @@ export const settingsByFile = (updates: Record<string, string>): ArkSettingPatch
 
 const unknownSetting = (key: string): Bridge.Text => {
 	return {
-		ar: `${key} مو إعداد تقدر تغيّره من اللوحة.`,
-		en: `${key} is not a setting the panel can change.`,
+		ar: `${key} ليس إعدادًا يمكن تغييره من اللوحة.`,
+		en: `${key} isn't a setting the panel can change.`,
 	};
 };
 
@@ -939,7 +939,7 @@ const booleanOf = (setting: ArkSetting, value: Bridge.Value) => {
 	}
 
 	throw new BridgeUserError({
-		ar: `«${setting.label.ar}» يا مشغّل يا مطفي، ما فيه خيار ثالث.`,
+		ar: `«${setting.label.ar}» إما مفعّل أو موقوف، ولا يوجد خيار ثالث.`,
 		en: `${setting.label.en} is either on or off, nothing else.`,
 	});
 };
@@ -951,7 +951,7 @@ const numberOf = (setting: ArkSetting, value: Bridge.Value) => {
 
 	if (!readable || !Number.isFinite(parsed)) {
 		throw new BridgeUserError({
-			ar: `«${setting.label.ar}» يبي له رقم.`,
+			ar: `«${setting.label.ar}» يتطلب رقمًا.`,
 			en: `${setting.label.en} needs a number.`,
 		});
 	}
@@ -961,14 +961,14 @@ const numberOf = (setting: ArkSetting, value: Bridge.Value) => {
 
 	if (min !== undefined && max !== undefined && (parsed < min || parsed > max)) {
 		throw new BridgeUserError({
-			ar: `«${setting.label.ar}» لازم يكون بين ${min} و ${max}.`,
+			ar: `«${setting.label.ar}» يلزم أن يكون بين ${min} و ${max}.`,
 			en: `${setting.label.en} must be between ${min} and ${max}.`,
 		});
 	}
 
 	if (min !== undefined && max === undefined && parsed < min) {
 		throw new BridgeUserError({
-			ar: `«${setting.label.ar}» لازم يكون ${min} أو أكثر.`,
+			ar: `«${setting.label.ar}» يلزم أن يكون ${min} أو أكثر.`,
 			en: `${setting.label.en} must be ${min} or more.`,
 		});
 	}
@@ -981,7 +981,7 @@ const textOf = (setting: ArkSetting, value: Bridge.Value) => {
 
 	if (hasControlCharacter(text)) {
 		throw new BridgeUserError({
-			ar: `«${setting.label.ar}» يبي له سطر واحد بدون رموز مخفية.`,
+			ar: `«${setting.label.ar}» يلزم أن يكون سطرًا واحدًا دون رموز مخفية.`,
 			en: `${setting.label.en} must be one line, with no line breaks or hidden characters.`,
 		});
 	}
@@ -990,7 +990,7 @@ const textOf = (setting: ArkSetting, value: Bridge.Value) => {
 
 	if (limit !== undefined && text.length > limit) {
 		throw new BridgeUserError({
-			ar: `«${setting.label.ar}» أطول من ${limit} حرف.`,
+			ar: `«${setting.label.ar}» يتجاوز الحد الأقصى لعدد الأحرف، وهو ${limit}.`,
 			en: `${setting.label.en} is longer than ${limit} characters.`,
 		});
 	}
@@ -998,8 +998,8 @@ const textOf = (setting: ArkSetting, value: Bridge.Value) => {
 	if (setting.pattern !== undefined && !new RegExp(setting.pattern).test(text)) {
 		throw new BridgeUserError(
 			setting.patternHint ?? {
-				ar: `«${setting.label.ar}» مكتوب بشكل ما نقدر نستخدمه.`,
-				en: `${setting.label.en} is written in a shape we cannot use.`,
+				ar: `«${setting.label.ar}» مكتوب بصيغة لا يمكن استخدامها.`,
+				en: `${setting.label.en} is written in a form we can't use.`,
 			},
 		);
 	}
