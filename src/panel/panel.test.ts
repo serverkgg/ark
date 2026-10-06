@@ -164,10 +164,10 @@ describe("the players page", () => {
 });
 
 describe("the destructive controls", () => {
-	it("asks twice before anything that cannot be taken back", () => {
-		expect(actionOf("live", "destroyWildDinos")?.confirm).toBe(BridgeConfirm.Strong);
+	it("asks twice before the wipe and once before the other destructive controls", () => {
+		expect(actionOf("live", "destroyWildDinos")?.confirm).toBe(BridgeConfirm.Normal);
 		expect(actionOf("saves", "wipe")?.confirm).toBe(BridgeConfirm.Strong);
-		expect(actionOf("admin", "rotateAdmin")?.confirm).toBe(BridgeConfirm.Strong);
+		expect(actionOf("admin", "rotateAdmin")?.confirm).toBe(BridgeConfirm.Normal);
 	});
 
 	it("says in Arabic and English what each one costs", () => {

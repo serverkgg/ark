@@ -378,7 +378,7 @@ const playersTab: Bridge.Tab = {
 					},
 				},
 				{
-					confirm: BridgeConfirm.Strong,
+					confirm: BridgeConfirm.Normal,
 					confirmText: {
 						ar: "يمنع الحظر الحساب من الدخول حتى تفك الحظر من جدول المحظورين في الصفحة نفسها.",
 						en: "A ban keeps the account out until you unban it from the Bans table on this same page.",
@@ -615,7 +615,7 @@ const controlsTab: Bridge.Tab = {
 					},
 				},
 				{
-					confirm: BridgeConfirm.Strong,
+					confirm: BridgeConfirm.Normal,
 					confirmText: {
 						ar: "سنحذف كل الديناصورات البرية لتظهر من جديد. لا تتأثر الديناصورات المروّضة، لكن أي ديناصور بري كنت تراقبه سيختفي.",
 						en: "We clear every wild dino so the map respawns them. Tamed dinos are safe, but any wild one you had your eye on is gone.",
@@ -642,7 +642,7 @@ const controlsTab: Bridge.Tab = {
 		{
 			actions: [
 				{
-					confirm: BridgeConfirm.Strong,
+					confirm: BridgeConfirm.Normal,
 					confirmText: {
 						ar: "تُطبَّق كلمة المرور الجديدة بعد الريستارت، وتتوقف القديمة في الوقت نفسه. وهي نفسها كلمة مرور RCON.",
 						en: "The new password goes live on the next restart and the old one stops working then. It's the RCON password too.",
