@@ -113,18 +113,9 @@ presence:
 
 files:
   protected:
-    - .steamcmd
-    - .steam
-    - .proton
-    - steamapps
     - .serverk-wine.json
     - .serverk-install.json
     - .serverk-mods.json
-    - Engine
-    - ShooterGame/Binaries/Win64/ArkAscendedServer.exe
-    - ShooterGame/Binaries/Win64/ShooterGame/Mods
-    - ShooterGame/Content
-    - ShooterGame/Plugins
   notable:
     - match: ShooterGame/Saved/Config/WindowsServer/GameUserSettings.ini
       label:
