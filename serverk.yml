@@ -21,6 +21,9 @@ metadata:
       sources:
         - curseforge
 
+steam:
+  appId: 2430930
+
 resources:
   minMemoryMb: 16384
   recommendedMemoryMb: 16384

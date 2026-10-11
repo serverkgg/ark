@@ -14,13 +14,13 @@ const SIZE_TIMEOUT_MS = 120_000;
 const SAFE_NAME = /^[A-Za-z0-9_.-]+$/;
 
 const MISSING_SAVE: Bridge.Text = {
-	ar: "حفظ هذه الماب لم يعد موجودًا.",
+	ar: "حفظ هذا الماب لم يعد موجودًا.",
 	en: "That map's save isn't there anymore.",
 };
 
 export const worldWipedText = (map: Bridge.Text): Bridge.Text => {
 	return {
-		ar: `تم وايب ماب ${map.ar}، ويبدأ التشغيل القادم عليها من جديد`,
+		ar: `تم وايب ماب ${map.ar}، ويبدأ التشغيل القادم عليه من جديد`,
 		en: `Wiped ${map.en}, the next start on that map begins fresh`,
 	};
 };

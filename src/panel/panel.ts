@@ -127,14 +127,14 @@ const launchTab: Bridge.Tab = {
 		{
 			confirm: BridgeConfirm.Normal,
 			confirmText: {
-				ar: "ننفّذ ريستارت لسيرفرك ليُطبَّق التغيير. لا يتأثر حفظك، فلكل ماب حفظها الخاص.",
+				ar: "ننفّذ ريستارت لسيرفرك ليُطبَّق التغيير. لا يتأثر حفظك، فلكل ماب حفظه الخاص.",
 				en: "We restart your server so the change takes effect. Your save is untouched, and every map keeps its own.",
 			},
 			fields: [
 				{
 					control: BridgeControl.Select,
 					help: {
-						ar: "لكل ماب حفظ مستقل، فالتبديل لا يحذف شيئًا. ارجع إلى الماب القديمة وستجد كل شيء كما تركته.",
+						ar: "لكل ماب حفظ مستقل، فالتبديل لا يحذف شيئًا. ارجع إلى الماب القديم وستجد كل شيء كما تركته.",
 						en: "Every map keeps a save of its own, so switching deletes nothing. Go back and you find it as you left it.",
 					},
 					key: MAP_VARIABLE,
@@ -344,7 +344,7 @@ const modsTab: Bridge.Tab = {
 				en: "The list is empty. Paste a mod ID here if you couldn't find it in the catalog.",
 			},
 			help: {
-				ar: "الترتيب مهم: المود الذي في الأعلى يُحمَّل أولًا، ويلزم أن يكون مود الماب فوق أي مود يعدّل عليها.",
+				ar: "الترتيب مهم: المود الذي في الأعلى يُحمَّل أولًا، ويلزم أن يكون مود الماب فوق أي مود يعدّل عليه.",
 				en: "Order matters: the mod on top loads first, and a map mod belongs above anything that changes it.",
 			},
 			id: "order",
@@ -675,7 +675,7 @@ const controlsTab: Bridge.Tab = {
 				{
 					confirm: BridgeConfirm.Strong,
 					confirmText: {
-						ar: "سيتم حذف حفظ هذه الماب كاملًا، بما فيه الشخصيات والمباني والديناصورات. نأخذ نسخة احتياطية قبل الحذف، ومنها تسترجع الماب إذا غيّرت رأيك.",
+						ar: "سيتم حذف حفظ هذا الماب كاملًا، بما فيه الشخصيات والمباني والديناصورات. نأخذ نسخة احتياطية قبل الحذف، ومنها تسترجع الماب إذا غيّرت رأيك.",
 						en: "We erase this map's whole save, including characters, buildings and dinos. We take a backup first, so you can restore the map if you change your mind.",
 					},
 					id: "wipe",
@@ -710,7 +710,7 @@ const controlsTab: Bridge.Tab = {
 				{
 					key: "active",
 					label: {
-						ar: "الشغّالة",
+						ar: "الشغّال",
 						en: "Active",
 					},
 				},
@@ -720,7 +720,7 @@ const controlsTab: Bridge.Tab = {
 				en: "No map saves yet. Start your server once.",
 			},
 			help: {
-				ar: "لكل ماب لعبت عليها مجلد هنا. لا يُنفَّذ الوايب إلا والسيرفر متوقف، وخذ نسخة احتياطية قبله.",
+				ar: "لكل ماب لعبت عليه مجلد هنا. لا يُنفَّذ الوايب إلا والسيرفر متوقف، وخذ نسخة احتياطية قبله.",
 				en: "Every map you've played on has a folder here. A wipe only runs while the server is stopped, so take a backup first.",
 			},
 			id: "saves",

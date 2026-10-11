@@ -187,7 +187,7 @@ export const SERVER_SETTINGS_GROUP = grouped(ArkSettingGroup.Server, [
 	inServerSettings({
 		fallback: "15",
 		help: {
-			ar: "بالدقائق. كلما قصّرت المدة كانت مابك أكثر أمانًا، لكن يحدث تقطيع بسيط مع كل حفظ.",
+			ar: "بالدقائق. كلما قصّرت المدة كان مابك أكثر أمانًا، لكن يحدث تقطيع بسيط مع كل حفظ.",
 			en: "In minutes. Shorter keeps your map safer, at the cost of a small stutter on every save.",
 		},
 		key: "AutoSavePeriodMinutes",

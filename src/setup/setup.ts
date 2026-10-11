@@ -34,7 +34,7 @@ export const setup: Bridge.Setup = {
 				CROSSPLAY_VARIABLE,
 			],
 			help: {
-				ar: "اختر الماب وعدد الخانات الآن. لكل ماب حفظها الخاص، والتبديل لاحقًا لا يحذف شيئًا.",
+				ar: "اختر الماب وعدد الخانات الآن. لكل ماب حفظه الخاص، والتبديل لاحقًا لا يحذف شيئًا.",
 				en: "Pick the map and the number of slots now. Every map keeps its own save, so switching later deletes nothing.",
 			},
 			id: "launch",
