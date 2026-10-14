@@ -13,7 +13,7 @@ const SIZE_TIMEOUT_MS = 120_000;
 
 const SAFE_NAME = /^[A-Za-z0-9_.-]+$/;
 
-const MISSING_SAVE: Bridge.Text = {
+export const MISSING_SAVE: Bridge.Text = {
 	ar: "حفظ هذا الماب لم يعد موجودًا.",
 	en: "That map's save isn't there anymore.",
 };
@@ -101,6 +101,10 @@ const sizesOf = async (context: Bridge.Context, names: string[]): Promise<Map<st
 	return sizes;
 };
 
+const saveExists = async (context: Bridge.Context, id: string) => {
+	return SAFE_NAME.test(id) && (await context.files.exists(savedArkDirectory(id)));
+};
+
 export const saves: Bridge.Collection = {
 	kind: BridgeKind.Collection,
 	protectedActions: [
@@ -123,17 +127,11 @@ export const saves: Bridge.Collection = {
 	},
 	actions: {
 		async wipe(context, row) {
-			if (!SAFE_NAME.test(row.id)) {
+			if (!(await saveExists(context, row.id))) {
 				throw new BridgeUserError(MISSING_SAVE);
 			}
 
-			const path = savedArkDirectory(row.id);
-
-			if (!(await context.files.exists(path))) {
-				throw new BridgeUserError(MISSING_SAVE);
-			}
-
-			await context.files.remove(path);
+			await context.files.remove(savedArkDirectory(row.id));
 
 			context.log("wiped a map's world from the panel", {
 				map: row.id,
@@ -151,5 +149,13 @@ export const saves: Bridge.Collection = {
 				text: worldWipedText(map),
 			});
 		},
+	},
+
+	async unavailable(context, row): Promise<Bridge.Unavailable> {
+		return (await saveExists(context, row.id))
+			? {}
+			: {
+					wipe: MISSING_SAVE,
+				};
 	},
 };

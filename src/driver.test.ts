@@ -185,6 +185,18 @@ describe("driver", () => {
 		}
 	});
 
+	it("every module with a protected action says when it is unavailable, so the panel asks before the platform stops the game", () => {
+		for (const [id, module] of Object.entries(driver.modules ?? {})) {
+			const protectedActions = "protectedActions" in module ? (module.protectedActions ?? []) : [];
+
+			if (protectedActions.length === 0) {
+				continue;
+			}
+
+			expect("unavailable" in module ? typeof module.unavailable : undefined, id).toBe("function");
+		}
+	});
+
 	it("gives the roster, the metrics and the admin card a help line in both languages", () => {
 		for (const id of [
 			"online",

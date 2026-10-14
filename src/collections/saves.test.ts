@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 import type { Bridge } from "@serverkgg/bridge";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
 import { OFFICIAL_MAPS, SAVED_ARKS_DIRECTORY, savedArkDirectory } from "../shared";
-import { saves, worldWipedText } from "./saves";
+import { MISSING_SAVE, saves, worldWipedText } from "./saves";
 
 const harness = (options: { maps?: string[]; variables?: Record<string, string> }) => {
 	const maps = options.maps ?? [];
@@ -151,6 +151,54 @@ describe("wiping one map's world", () => {
 		).rejects.toThrow();
 
 		expect(removed).toEqual([]);
+	});
+});
+
+describe("saying when a wipe is unavailable, before the platform stops the game", () => {
+	it("offers the wipe on a map whose save is there", async () => {
+		const { context } = harness({
+			maps: [
+				"TheIsland_WP",
+			],
+		});
+
+		expect(
+			await saves.unavailable?.(context, {
+				id: "TheIsland_WP",
+			}),
+		).toEqual({});
+	});
+
+	it("closes the wipe on a save that is gone, with the sentence the wipe itself refuses with", async () => {
+		const { context } = harness({
+			maps: [
+				"TheIsland_WP",
+			],
+		});
+
+		expect(
+			await saves.unavailable?.(context, {
+				id: "Ragnarok_WP",
+			}),
+		).toEqual({
+			wipe: MISSING_SAVE,
+		});
+	});
+
+	it("closes the wipe on a row id that is a path rather than a folder name", async () => {
+		const { context } = harness({
+			maps: [
+				"TheIsland_WP",
+			],
+		});
+
+		expect(
+			await saves.unavailable?.(context, {
+				id: "../../ShooterGame",
+			}),
+		).toEqual({
+			wipe: MISSING_SAVE,
+		});
 	});
 });
 
