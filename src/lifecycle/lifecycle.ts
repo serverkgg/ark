@@ -1,6 +1,6 @@
 import { type Bridge, BridgeKind } from "@serverkgg/bridge";
 import { BridgeEventName } from "@serverkgg/bridge/protocol";
-import { protonCommand } from "@serverkgg/bridge/wine";
+import { PROTON_HEADLESS_ENVIRONMENT, protonCommand } from "@serverkgg/bridge/wine";
 import {
 	applyControlConfig,
 	applyLaunchVariables,
@@ -24,26 +24,6 @@ import {
 	STEAM_APP_ID,
 } from "../shared";
 import { startArgs } from "./arkCommand";
-
-const HEADLESS_SDL_DRIVERS_THE_ENGINE_REQUIRES = {
-	SDL_AUDIODRIVER: "dummy",
-	SDL_VIDEODRIVER: "dummy",
-	XDG_SESSION_TYPE: "headless",
-};
-
-const WRITABLE_PROTON_RUNTIME_DIRECTORY = {
-	XDG_RUNTIME_DIR: "/tmp/serverk-xdg",
-};
-
-const XALIA_OFF_TO_KEEP_ITS_CRASH_OUT_OF_THE_CONSOLE = {
-	PROTON_USE_XALIA: "0",
-};
-
-export const ARK_ENVIRONMENT: Record<string, string> = {
-	...XALIA_OFF_TO_KEEP_ITS_CRASH_OUT_OF_THE_CONSOLE,
-	...HEADLESS_SDL_DRIVERS_THE_ENGINE_REQUIRES,
-	...WRITABLE_PROTON_RUNTIME_DIRECTORY,
-};
 
 export const SERVER_READY = /has successfully started/;
 
@@ -126,7 +106,7 @@ export const lifecycle: Bridge.Lifecycle = {
 				rconPort: RCON_PORT,
 				sessionName: await readSessionName(context),
 			}),
-			environment: ARK_ENVIRONMENT,
+			environment: PROTON_HEADLESS_ENVIRONMENT,
 			exe: SERVER_EXE,
 		});
 

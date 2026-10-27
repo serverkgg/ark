@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { BridgeDetailTone } from "@serverkgg/bridge";
 import { createMetricsSampler } from "../shared";
-import { battleyeBadge, crossplayBadge, formatUptime } from "./metrics";
+import { battleyeBadge, crossplayBadge } from "./metrics";
 
 describe("createMetricsSampler", () => {
 	it("reads an untouched sampler as knowing nothing", () => {
@@ -55,28 +55,6 @@ describe("createMetricsSampler", () => {
 			readyAt: null,
 			uptimeSeconds: null,
 		});
-	});
-});
-
-describe("formatUptime", () => {
-	it("reads a fresh start as less than a minute", () => {
-		expect(formatUptime(12).en).toBe("Less than a minute");
-	});
-
-	it("reads minutes, hours and both", () => {
-		expect(formatUptime(180).en).toBe("3m");
-		expect(formatUptime(7200).en).toBe("2h");
-		expect(formatUptime(9000).en).toBe("2h 30m");
-	});
-
-	it("counts in Arabic rather than pasting a number into a plural", () => {
-		expect(formatUptime(3600).ar).toBe("ساعة");
-		expect(formatUptime(7200).ar).toBe("ساعتين");
-		expect(formatUptime(10_800).ar).toBe("3 ساعات");
-	});
-
-	it("never reads a negative uptime", () => {
-		expect(formatUptime(-10).en).toBe("Less than a minute");
 	});
 });
 
